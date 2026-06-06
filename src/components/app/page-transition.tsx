@@ -1,3 +1,9 @@
+// "use client";
+
+import { usePathname } from "next/navigation";
+// import { useEffect, useRef, useState } from "react";
+// import type { ReactNode } from "react";
+
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const prevPath = useRef(pathname);
