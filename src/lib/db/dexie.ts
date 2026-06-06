@@ -1,0 +1,44 @@
+import Dexie, { type EntityTable } from "dexie";
+
+export type SyncStatus = "synced" | "pending" | "conflict";
+
+export interface LocalTask {
+  id: string;
+  nuclei_id: string;
+  created_by: string;
+  title: string;
+  description: string | null;
+  section: string;
+  due_date: string | null;
+  project_id: string | null;
+  area_id: string | null;
+  is_completed: boolean;
+  completed_at: string | null;
+  position: number | null;
+  created_at: string;
+  updated_at: string;
+  _sync: SyncStatus;
+  _local_mtime: number;
+  _server_updated_at: string;
+}
+
+export interface SyncQueueItem {
+  id?: number;
+  task_id: string;
+  action: "insert" | "update" | "delete";
+  payload: Record<string, unknown>;
+  created_at: number;
+  retries: number;
+}
+
+const db = new Dexie("plco") as Dexie & {
+  tasks: EntityTable<LocalTask, "id">;
+  sync_queue: EntityTable<SyncQueueItem, "id">;
+};
+
+db.version(1).stores({
+  tasks: "id, nuclei_id, section, _sync, _local_mtime",
+  sync_queue: "++id, task_id, created_at",
+});
+
+export { db };
