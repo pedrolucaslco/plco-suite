@@ -80,7 +80,6 @@ export function TaskSection({ section }: TaskSectionProps) {
 
   const {
     tasks,
-    loading,
     syncState,
     syncError,
     updateTask,
