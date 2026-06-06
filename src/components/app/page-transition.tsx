@@ -1,8 +1,4 @@
 export function PageTransition({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
-
-export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const prevPath = useRef(pathname);
   const [animDir, setAnimDir] = useState<string | null>(null);
