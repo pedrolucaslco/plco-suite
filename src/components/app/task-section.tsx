@@ -110,6 +110,14 @@ export function TaskSection({ section }: TaskSectionProps) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-ink-muted text-body">Carregando...</p>
+        </div>
+      );
+    }
+
     const activeTasks = tasks.filter((t) => !t.is_completed);
     const oldIndex = activeTasks.findIndex((t) => t.id === active.id);
     const newIndex = activeTasks.findIndex((t) => t.id === over.id);
