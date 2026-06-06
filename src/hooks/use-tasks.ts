@@ -209,7 +209,6 @@ export function useTasks(section: string) {
 
   return {
     tasks,
-    loading,
     syncState,
     syncError,
     addTask,
