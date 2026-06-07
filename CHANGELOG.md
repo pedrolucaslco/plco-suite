@@ -1,10 +1,16 @@
 # Changelog
 
-## [0.9.1] — 2026-06-07
+## [0.9.2] — 2026-06-07
 
-### Added
-- **Inbox na sidebar desktop**: seção Inbox adicionada à sidebar (antes só aparecia no mobile via Navegar)
-- **Configurações na sidebar desktop**: botão "Configurações" na sidebar abre o mesmo modal de configurações disponível no mobile
+### Fixed
+- **Erro "not find updated at" ao editar tarefa**: função `pushPending` no `sync-engine.ts` usava `continue` dentro do handler de insert, que pulava a limpeza da fila de sync (remoção do item e set de `_sync: "synced"`). Isso fazia com que o sync engine travasse em loop tentando reprocessar o mesmo item. Removido o `continue` para garantir que a limpeza sempre execute.
+- **Payload inválido em updates de projeto/área**: `use-projects.ts` e `use-areas.ts` enviavam `updated_at` no payload de update, mas as tabelas `projects` e `areas` no Supabase **não possuem** coluna `updated_at` (apenas `created_at`). Removido o campo inválido. A tabela `tasks` já incluía `updated_at` corretamente.
+- **Realtime `_server_updated_at` para áreas/projetos**: handlers de Realtime para `areas` e `projects` usavam `newRow.created_at` como `_server_updated_at` (correto), mas `tasks` usava `newRow.updated_at`. Padronizado: todas as entidades usam `updated_at` com fallback para `created_at`.
+- **Código duplicado no `use-realtime-sync`**: refatorado para eliminar `any` e centralizar lógica de timestamp.
+
+### Changed
+- `sync-engine.ts`: insert handler agora usa `serverRow.updated_at ?? serverRow.created_at` para capturar timestamp do servidor, funcionando para tasks (tem `updated_at`) e áreas/projetos (têm `created_at`).
+- `use-realtime-sync.ts`: handlers refatorados para funções individuais com tipo específico, eliminando casts com `any`.
 
 ## [0.9.0] — 2026-06-07
 

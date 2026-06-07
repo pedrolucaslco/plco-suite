@@ -78,13 +78,12 @@ export function useAreas() {
 
   const updateArea = useCallback(
     async (id: string, data: Partial<LocalArea>) => {
-      const now = new Date().toISOString();
       await db.areas.update(id, {
         ...data,
         _sync: "pending",
         _local_mtime: Date.now(),
       });
-      await syncEngine.enqueue(id, "area", "update", { ...data, updated_at: now });
+      await syncEngine.enqueue(id, "area", "update", { ...data });
       if (navigator.onLine) syncEngine.pushPending();
     },
     [],

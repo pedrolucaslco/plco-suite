@@ -114,12 +114,13 @@ class SyncEngine {
             .select();
           if (error) throw error;
           const serverRow = data?.[0] as Record<string, unknown> | undefined;
-          if (serverRow?.updated_at) {
-            await (dbTable(item.entity_type) as any).update(item.entity_id, {
-              _sync: "synced",
-              _server_updated_at: serverRow.updated_at,
-            });
-            continue;
+          if (serverRow) {
+            const serverTs = (serverRow.updated_at ?? serverRow.created_at) as string | undefined;
+            if (serverTs) {
+              await (dbTable(item.entity_type) as any).update(item.entity_id, {
+                _server_updated_at: serverTs,
+              });
+            }
           }
         } else if (item.action === "update") {
           const { error } = await this.supabase

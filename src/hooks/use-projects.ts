@@ -80,13 +80,12 @@ export function useProjects() {
 
   const updateProject = useCallback(
     async (id: string, data: Partial<LocalProject>) => {
-      const now = new Date().toISOString();
       await db.projects.update(id, {
         ...data,
         _sync: "pending",
         _local_mtime: Date.now(),
       });
-      await syncEngine.enqueue(id, "project", "update", { ...data, updated_at: now });
+      await syncEngine.enqueue(id, "project", "update", { ...data });
       if (navigator.onLine) syncEngine.pushPending();
     },
     [],
