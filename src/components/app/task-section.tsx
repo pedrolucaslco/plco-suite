@@ -34,9 +34,10 @@ interface SortableTaskRowProps {
   task: LocalTask;
   onToggle: (id: string, completed: boolean) => void;
   onSelect: (task: LocalTask) => void;
+  onSectionChange: (id: string, section: string) => void;
 }
 
-function SortableTaskRow({ task, onToggle, onSelect }: SortableTaskRowProps) {
+function SortableTaskRow({ task, onToggle, onSelect, onSectionChange }: SortableTaskRowProps) {
   const {
     attributes,
     listeners,
@@ -66,7 +67,7 @@ function SortableTaskRow({ task, onToggle, onSelect }: SortableTaskRowProps) {
         <GripVertical size={16} />
       </button>
       <div className="flex-1 min-w-0">
-        <TaskRow task={task} onToggle={onToggle} onSelect={onSelect} />
+        <TaskRow task={task} onToggle={onToggle} onSelect={onSelect} onSectionChange={onSectionChange} />
       </div>
     </div>
   );
@@ -104,6 +105,10 @@ export function TaskSection({ section }: TaskSectionProps) {
   function handleSelect(task: LocalTask) {
     setSelectedTask(task);
     setDetailOpen(true);
+  }
+
+  async function handleSectionChange(id: string, newSection: string) {
+    await updateTask(id, { section: newSection as LocalTask["section"] });
   }
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -185,6 +190,7 @@ export function TaskSection({ section }: TaskSectionProps) {
               task={task}
               onToggle={handleToggle}
               onSelect={handleSelect}
+              onSectionChange={handleSectionChange}
             />
           ))}
         </SortableContext>

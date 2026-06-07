@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.0] — 2026-06-07
+
+### Added
+- **Arrastar tarefas entre seções**: badge de seção no TaskRow é arrastável (native HTML5 drag). Soltar sobre uma seção na sidebar desktop move a tarefa para aquela seção automaticamente.
+- **Clique no badge para alternar seção**: tocar no badge de seção do TaskRow cicla rapidamente entre Inbox → Hoje → Em Breve → Qlq Hora → Algum Dia, sem precisar abrir o detalhe da tarefa.
+
 ## [0.6.0] — 2026-06-07
 
 ### Added

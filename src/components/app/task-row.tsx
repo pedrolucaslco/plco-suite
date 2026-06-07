@@ -1,15 +1,20 @@
 "use client";
 
+import { useCallback } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { setDraggedTaskId } from "@/lib/drag-state";
 import type { LocalTask } from "@/lib/db/dexie";
 
 interface TaskRowProps {
   task: LocalTask;
   onToggle: (id: string, completed: boolean) => void;
   onSelect: (task: LocalTask) => void;
+  onSectionChange?: (id: string, section: string) => void;
 }
+
+const SECTIONS = ["inbox", "today", "upcoming", "anytime", "someday"] as const;
 
 const sectionBadge: Record<string, { label: string; class: string }> = {
   inbox: { label: "Inbox", class: "bg-muted text-ink-mid" },
@@ -19,8 +24,26 @@ const sectionBadge: Record<string, { label: string; class: string }> = {
   someday: { label: "Algum Dia", class: "bg-muted text-ink-muted" },
 };
 
-export function TaskRow({ task, onToggle, onSelect }: TaskRowProps) {
+export function TaskRow({ task, onToggle, onSelect, onSectionChange }: TaskRowProps) {
   const badge = sectionBadge[task.section];
+
+  const handleBadgeClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!onSectionChange) return;
+    const idx = SECTIONS.indexOf(task.section as typeof SECTIONS[number]);
+    const next = SECTIONS[(idx + 1) % SECTIONS.length];
+    onSectionChange(task.id, next);
+  }, [task.id, task.section, onSectionChange]);
+
+  const handleBadgeDragStart = useCallback((e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", task.id);
+    setDraggedTaskId(task.id);
+  }, [task.id]);
+
+  const handleBadgeDragEnd = useCallback(() => {
+    setDraggedTaskId(null);
+  }, []);
 
   return (
     <div
@@ -53,7 +76,14 @@ export function TaskRow({ task, onToggle, onSelect }: TaskRowProps) {
 
         <div className="flex items-center gap-2 text-caption text-ink-muted">
           {badge && (
-            <Badge variant="outline" className={badge.class}>
+            <Badge
+              variant="outline"
+              className={cn(badge.class, onSectionChange && "cursor-grab active:cursor-grabbing")}
+              draggable={!!onSectionChange}
+              onClick={handleBadgeClick}
+              onDragStart={handleBadgeDragStart}
+              onDragEnd={handleBadgeDragEnd}
+            >
               {badge.label}
             </Badge>
           )}

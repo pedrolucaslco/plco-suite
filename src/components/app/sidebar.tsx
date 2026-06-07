@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { NucleusSelector } from "./nucleus-selector";
 import { useNucleusStore } from "@/stores/nucleus";
-import { db, type LocalArea, type LocalProject } from "@/lib/db/dexie";
+import { db, type LocalArea, type LocalProject, type LocalTask } from "@/lib/db/dexie";
 import { liveQuery } from "dexie";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,6 +34,7 @@ import {
 import { useAreas } from "@/hooks/use-areas";
 import { useProjects } from "@/hooks/use-projects";
 import { syncEngine } from "@/lib/sync/sync-engine";
+import { draggedTaskId } from "@/lib/drag-state";
 
 const sections: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Hoje", href: "/app/today", icon: Star },
@@ -166,6 +167,35 @@ export function Sidebar() {
   const { addProject, updateProject } = useProjects();
   const [syncing, setSyncing] = useState(false);
   const [syncOk, setSyncOk] = useState(false);
+  const [dragOverSection, setDragOverSection] = useState<string | null>(null);
+
+  const handleSectionDragOver = useCallback((e: React.DragEvent, section: string) => {
+    if (!draggedTaskId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverSection(section);
+  }, []);
+
+  const handleSectionDragLeave = useCallback(() => {
+    setDragOverSection(null);
+  }, []);
+
+  const handleSectionDrop = useCallback(async (e: React.DragEvent, section: string) => {
+    e.preventDefault();
+    setDragOverSection(null);
+    const taskId = draggedTaskId ?? e.dataTransfer.getData("text/plain");
+    if (!taskId || !nucleusId) return;
+    const task = await db.tasks.get(taskId);
+    if (!task || task.section === section) return;
+    const mtime = Date.now();
+    await db.tasks.update(taskId, {
+      section: section as LocalTask["section"],
+      _sync: "pending",
+      _local_mtime: mtime,
+    });
+    await syncEngine.enqueue(taskId, "task", "update", { section });
+    if (navigator.onLine) syncEngine.pushPending();
+  }, [nucleusId]);
 
   const handleSync = useCallback(async () => {
     if (!nucleusId || syncing) return;
@@ -276,20 +306,28 @@ export function Sidebar() {
         </div>
         {sections.map((s) => {
           const Icon = s.icon;
+          const sectionName = s.href.split("/").pop() ?? "today";
           return (
-            <Link
+            <div
               key={s.href}
-              href={s.href}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-body transition-colors",
-                pathname.startsWith(s.href)
-                  ? "bg-muted text-ink font-medium"
-                  : "text-ink-mid hover:text-ink hover:bg-muted/50",
-              )}
+              onDragOver={(e) => handleSectionDragOver(e, sectionName)}
+              onDragLeave={handleSectionDragLeave}
+              onDrop={(e) => handleSectionDrop(e, sectionName)}
             >
-              <Icon size={18} className="shrink-0" />
-              {s.label}
-            </Link>
+              <Link
+                href={s.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-body transition-colors",
+                  pathname.startsWith(s.href)
+                    ? "bg-muted text-ink font-medium"
+                    : "text-ink-mid hover:text-ink hover:bg-muted/50",
+                  dragOverSection === sectionName && "ring-1 ring-primary/40 bg-primary/5",
+                )}
+              >
+                <Icon size={18} className="shrink-0" />
+                {s.label}
+              </Link>
+            </div>
           );
         })}
 
