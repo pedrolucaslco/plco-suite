@@ -92,9 +92,6 @@ export function TaskDetail({
 
   if (!task) return null;
 
-  const currentArea = areas.find((a) => a.id === entityAreaId);
-  const currentProject = projects.find((p) => p.id === entityProjectId);
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-2xl px-5 pb-8">

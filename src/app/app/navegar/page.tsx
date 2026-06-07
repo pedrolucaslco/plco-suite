@@ -2,48 +2,107 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Settings, Circle, Diamond, FolderKanban, Briefcase, Plus, Hash } from "lucide-react";
+import { usePathname } from "next/navigation";
+import {
+  Settings,
+  Star,
+  Calendar,
+  Circle,
+  Diamond,
+  Layers2,
+  FolderClosed,
+  Plus,
+  ChevronDown,
+  ChevronRight,
+  Pencil,
+  GripVertical,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SettingsSheet } from "@/components/app/settings-sheet";
 import { useAreas } from "@/hooks/use-areas";
 import { useProjects } from "@/hooks/use-projects";
+import { cn } from "@/lib/utils";
+
+let draggedProjectId: string | null = null;
 
 const sections = [
-  {
-    label: "Qualquer Hora",
-    href: "/app/anytime",
-    icon: Circle,
-    description: "Tarefas sem data definida",
-  },
-  {
-    label: "Algum Dia",
-    href: "/app/someday",
-    icon: Diamond,
-    description: "Ideias e planos futuros",
-  },
+  { label: "Hoje", href: "/app/today", icon: Star, description: "Tarefas para hoje" },
+  { label: "Em Breve", href: "/app/upcoming", icon: Calendar, description: "Tarefas com data futura" },
+  { label: "Qualquer Hora", href: "/app/anytime", icon: Circle, description: "Tarefas sem data definida" },
+  { label: "Algum Dia", href: "/app/someday", icon: Diamond, description: "Ideias e planos futuros" },
 ];
 
 export default function NavegarPage() {
+  const pathname = usePathname();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [newArea, setNewArea] = useState("");
-  const [newProject, setNewProject] = useState("");
-  const [showNewArea, setShowNewArea] = useState(false);
-  const [showNewProject, setShowNewProject] = useState(false);
-  const { areas, addArea, removeArea } = useAreas();
-  const { projects, addProject, removeProject } = useProjects();
+  const [newType, setNewType] = useState<"area" | "project" | null>(null);
+  const [newName, setNewName] = useState("");
+  const [showNewMenu, setShowNewMenu] = useState(false);
+  const [editTarget, setEditTarget] = useState<{
+    type: "area" | "project";
+    id: string;
+    name: string;
+  } | null>(null);
+  const [editName, setEditName] = useState("");
+  const { areas, addArea, updateArea } = useAreas();
+  const { projects, addProject, updateProject } = useProjects();
+  const [expandedAreas, setExpandedAreas] = useState<Set<string>>(new Set());
 
-  async function handleAddArea() {
-    if (!newArea.trim()) return;
-    await addArea(newArea.trim());
-    setNewArea("");
-    setShowNewArea(false);
+  async function handleCreate() {
+    if (!newName.trim() || !newType) return;
+    if (newType === "area") await addArea(newName.trim());
+    else await addProject(newName.trim());
+    setNewName("");
+    setNewType(null);
+    setShowNewMenu(false);
   }
 
-  async function handleAddProject() {
-    if (!newProject.trim()) return;
-    await addProject(newProject.trim());
-    setNewProject("");
-    setShowNewProject(false);
+  const standaloneProjects = projects.filter((p) => p.area_id === null);
+
+  function toggleArea(areaId: string) {
+    setExpandedAreas((prev) => {
+      const next = new Set(prev);
+      if (next.has(areaId)) next.delete(areaId);
+      else next.add(areaId);
+      return next;
+    });
+  }
+
+  function handleEdit(type: "area" | "project", id: string, name: string) {
+    setEditTarget({ type, id, name });
+    setEditName(name);
+  }
+
+  async function handleSaveEdit() {
+    if (!editTarget || !editName.trim()) return;
+    if (editTarget.type === "area") {
+      await updateArea(editTarget.id, { name: editName.trim() });
+    } else {
+      await updateProject(editTarget.id, { name: editName.trim() });
+    }
+    setEditTarget(null);
+    setEditName("");
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    if (draggedProjectId) e.preventDefault();
+  }
+
+  function handleDropOnArea(areaId: string) {
+    return async (e: React.DragEvent) => {
+      e.preventDefault();
+      if (draggedProjectId && draggedProjectId !== areaId) {
+        await updateProject(draggedProjectId, { area_id: areaId });
+        setExpandedAreas((prev) => { const n = new Set(prev); n.add(areaId); return n; });
+      }
+      draggedProjectId = null;
+    };
   }
 
   return (
@@ -83,88 +142,195 @@ export default function NavegarPage() {
           );
         })}
 
-        <div className="px-4 lg:px-6 py-2 bg-muted/30 flex items-center justify-between">
-          <p className="text-caption font-medium text-ink-mid uppercase tracking-wider text-xs">
-            Áreas
-          </p>
-        </div>
-
-        {areas.map((area) => (
-          <Link
-            key={area.id}
-            href={`/app/areas/${area.id}`}
-            className="flex items-center gap-4 px-4 lg:px-6 py-4 border-b border-hairline hover:bg-muted/30 transition-colors active:bg-muted/50"
-          >
-            <Hash size={22} className="text-ink-mid shrink-0" />
-            <p className="text-body text-ink flex-1">{area.name}</p>
-          </Link>
-        ))}
-
-        {showNewArea ? (
-          <div className="px-4 lg:px-6 py-3 border-b border-hairline">
-            <Input
-              value={newArea}
-              onChange={(e) => setNewArea(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddArea();
-                if (e.key === "Escape") { setShowNewArea(false); setNewArea(""); }
-              }}
-              placeholder="Nome da área"
-              autoFocus
-            />
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowNewArea(true)}
-            className="flex items-center gap-4 px-4 lg:px-6 py-3 border-b border-hairline text-ink-mid hover:text-ink hover:bg-muted/30 transition-colors active:bg-muted/50"
-          >
-            <Plus size={18} />
-            <span className="text-body">Nova área</span>
-          </button>
+        {areas.length > 0 && (
+          <>
+            <div className="px-4 lg:px-6 py-2 bg-muted/30">
+              <p className="text-caption font-medium text-ink-mid uppercase tracking-wider text-xs">
+                Áreas
+              </p>
+            </div>
+            {areas.map((area) => {
+              const areaProjects = projects.filter((p) => p.area_id === area.id);
+              const isExpanded = expandedAreas.has(area.id);
+              return (
+                <div key={area.id}>
+                  <div
+                    onDragOver={handleDragOver}
+                    onDrop={handleDropOnArea(area.id)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 lg:px-6 py-3 border-b border-hairline",
+                      draggedProjectId && "bg-primary/5",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); toggleArea(area.id); }}
+                      className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
+                    >
+                      {areaProjects.length > 0 ? (
+                        isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+                      ) : (
+                        <span className="w-4" />
+                      )}
+                    </button>
+                    <Link
+                      href={`/app/areas/${area.id}`}
+                      className="flex items-center gap-3 flex-1 min-w-0"
+                    >
+                      <Layers2 size={20} className="shrink-0 text-ink-mid" />
+                      <span className="text-body text-ink flex-1 truncate">{area.name}</span>
+                      {areaProjects.length > 0 && (
+                        <span className="text-caption text-ink-muted">{areaProjects.length}</span>
+                      )}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleEdit("area", area.id, area.name)}
+                      className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
+                    >
+                      <Pencil size={15} />
+                    </button>
+                  </div>
+                  {isExpanded && areaProjects.map((p) => (
+                    <Link
+                      key={p.id}
+                      href={`/app/projects/${p.id}`}
+                      className={cn(
+                        "flex items-center gap-3 pl-12 pr-4 lg:pr-6 py-3 border-b border-hairline transition-colors",
+                        pathname === `/app/projects/${p.id}`
+                          ? "bg-muted/50 text-ink font-medium"
+                          : "text-ink-mid hover:text-ink hover:bg-muted/30 active:bg-muted/50",
+                      )}
+                    >
+                      <FolderClosed size={18} className="shrink-0" />
+                      <span className="text-body">{p.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              );
+            })}
+          </>
         )}
 
-        <div className="px-4 lg:px-6 py-2 bg-muted/30 flex items-center justify-between">
-          <p className="text-caption font-medium text-ink-mid uppercase tracking-wider text-xs">
-            Projetos
-          </p>
-        </div>
+        {standaloneProjects.length > 0 && (
+          <>
+            <div className="px-4 lg:px-6 py-2 bg-muted/30">
+              <p className="text-caption font-medium text-ink-mid uppercase tracking-wider text-xs">
+                Projetos
+              </p>
+            </div>
+            {standaloneProjects.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center gap-3 px-4 lg:px-6 py-3 border-b border-hairline"
+                draggable
+                onDragStart={() => { draggedProjectId = p.id; }}
+              >
+                <GripVertical size={16} className="shrink-0 text-ink-muted" />
+                <Link
+                  href={`/app/projects/${p.id}`}
+                  className={cn(
+                    "flex items-center gap-3 flex-1 min-w-0 transition-colors",
+                    pathname === `/app/projects/${p.id}`
+                      ? "text-ink font-medium"
+                      : "text-ink-mid hover:text-ink",
+                  )}
+                >
+                  <FolderClosed size={20} className="shrink-0" />
+                  <span className="text-body text-ink flex-1 truncate">{p.name}</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleEdit("project", p.id, p.name)}
+                  className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
+                >
+                  <Pencil size={15} />
+                </button>
+              </div>
+            ))}
+          </>
+        )}
 
-        {projects.map((project) => (
-          <Link
-            key={project.id}
-            href={`/app/projects/${project.id}`}
-            className="flex items-center gap-4 px-4 lg:px-6 py-4 border-b border-hairline hover:bg-muted/30 transition-colors active:bg-muted/50"
-          >
-            <Briefcase size={22} className="text-ink-mid shrink-0" />
-            <p className="text-body text-ink flex-1">{project.name}</p>
-          </Link>
-        ))}
-
-        {showNewProject ? (
-          <div className="px-4 lg:px-6 py-3 border-b border-hairline">
+        <div className="relative px-4 lg:px-6 py-3 border-b border-hairline">
+          {newType ? (
             <Input
-              value={newProject}
-              onChange={(e) => setNewProject(e.target.value)}
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddProject();
-                if (e.key === "Escape") { setShowNewProject(false); setNewProject(""); }
+                if (e.key === "Enter") handleCreate();
+                if (e.key === "Escape") { setNewType(null); setNewName(""); }
               }}
-              placeholder="Nome do projeto"
+              placeholder={newType === "area" ? "Nome da área" : "Nome do projeto"}
               autoFocus
             />
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowNewProject(true)}
-            className="flex items-center gap-4 px-4 lg:px-6 py-3 border-b border-hairline text-ink-mid hover:text-ink hover:bg-muted/30 transition-colors active:bg-muted/50"
-          >
-            <Plus size={18} />
-            <span className="text-body">Novo projeto</span>
-          </button>
-        )}
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowNewMenu(!showNewMenu)}
+              className="flex items-center gap-3 text-ink-mid hover:text-ink transition-colors"
+            >
+              <Plus size={18} />
+              <span className="text-body">Nova lista</span>
+            </button>
+          )}
+
+          {showNewMenu && !newType && (
+            <div className="absolute left-4 right-4 bottom-full mb-1 bg-surface border border-hairline rounded-lg shadow-lg overflow-hidden z-10">
+              <button
+                type="button"
+                onClick={() => { setNewType("area"); setShowNewMenu(false); }}
+                className="flex items-center gap-3 w-full px-4 py-3 text-body text-ink hover:bg-muted/30 transition-colors text-left border-b border-hairline"
+              >
+                <Layers2 size={18} />
+                Nova área
+              </button>
+              <button
+                type="button"
+                onClick={() => { setNewType("project"); setShowNewMenu(false); }}
+                className="flex items-center gap-3 w-full px-4 py-3 text-body text-ink hover:bg-muted/30 transition-colors text-left"
+              >
+                <FolderClosed size={18} />
+                Novo projeto
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      <Dialog
+        open={!!editTarget}
+        onOpenChange={(o) => { if (!o) { setEditTarget(null); setEditName(""); } }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Editar {editTarget?.type === "area" ? "área" : "projeto"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveEdit();
+                if (e.key === "Escape") { setEditTarget(null); setEditName(""); }
+              }}
+              placeholder="Nome"
+              autoFocus
+            />
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleSaveEdit}
+                disabled={!editName.trim()}
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-body font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>

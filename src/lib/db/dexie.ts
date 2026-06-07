@@ -71,6 +71,16 @@ db.version(2).stores({
 
 db.version(3).stores({
   tasks: "id, nuclei_id, section, due_date, _sync, _local_mtime",
+  sync_queue: "++id, task_id, created_at",
+});
+
+db.version(4).stores({
+  tasks: "id, nuclei_id, section, due_date, _sync, _local_mtime",
+  sync_queue: "++id, task_id, created_at",
+});
+
+db.version(5).stores({
+  tasks: "id, nuclei_id, section, due_date, area_id, _sync, _local_mtime",
   areas: "id, nuclei_id, _sync, _local_mtime",
   projects: "id, nuclei_id, area_id, _sync, _local_mtime",
   sync_queue: "++id, entity_id, entity_type, created_at",

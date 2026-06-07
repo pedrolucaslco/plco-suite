@@ -23,18 +23,50 @@ export default function AreaPage() {
 
   useEffect(() => {
     if (!nucleusId) return;
+    const nid: string = nucleusId;
 
     db.areas.get(areaId).then((a) => setArea(a ?? null));
 
-    const sub = liveQuery(() =>
-      db.tasks
+    async function loadTasks() {
+      const projectsInArea = await db.projects
+        .where("area_id")
+        .equals(areaId)
+        .toArray();
+      const projectIds = new Set(projectsInArea.map((p) => p.id));
+
+      const allTasks = await db.tasks
         .where("nuclei_id")
-        .equals(nucleusId)
-        .filter((t) => t.area_id === areaId && !t.is_completed)
-        .toArray(),
+        .equals(nid)
+        .filter((t) =>
+          !t.is_completed && (
+            t.area_id === areaId ||
+            projectIds.has(t.project_id ?? "")
+          )
+        )
+        .toArray();
+
+      setTasks(allTasks.sort((a, b) => (a.position ?? 999) - (b.position ?? 999)));
+    }
+
+    loadTasks();
+
+    const sub = liveQuery(() =>
+      Promise.all([
+        db.projects.where("area_id").equals(areaId).toArray(),
+        db.tasks.where("nuclei_id").equals(nid).toArray(),
+      ]).then(([projectsInArea, allTasks]) => {
+        const projectIds = new Set(projectsInArea.map((p) => p.id));
+        return allTasks
+          .filter((t) =>
+            !t.is_completed && (
+              t.area_id === areaId ||
+              projectIds.has(t.project_id ?? "")
+            )
+          )
+          .sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+      }),
     ).subscribe({
-      next: (result) =>
-        setTasks(result.sort((a, b) => (a.position ?? 999) - (b.position ?? 999))),
+      next: setTasks,
       error: () => {},
     });
 

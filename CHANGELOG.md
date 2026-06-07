@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.4.0] — 2026-06-07
+
+### Added
+- **Tarefas em áreas**: tarefa pode pertencer diretamente a uma área (`area_id`) sem necessariamente estar num projeto. Área detalhada mostra tarefas diretas + via projetos.
+- **Sidebar com hierarquia completa**: Seções (Hoje, Breve, Qualquer Hora, Algum Dia) → Áreas expansíveis com projetos aninhados → Projetos standalone. Sem Inbox/Navegar na sidebar.
+- **Navegar page (mobile)**: espelha conteúdo da sidebar — seções, áreas, projetos standalone, com botão de configurações.
+- **Botão "Nova lista" unificado**: dropdown com "Nova área" / "Novo projeto" na sidebar (desktop) e Navegar (mobile), substituindo os botões "+" separados.
+- **Editar nome**: ícone lápis (hover na sidebar, sempre visível no mobile) abre Dialog para renomear área ou projeto.
+- **Drag-and-drop projeto → área**: projetos standalone podem ser arrastados para dentro de áreas, tanto na sidebar quanto no Navegar.
+- **Contexto de área no FAB**: `CreateTaskFab` herda `areaId` da URL, e `TaskDetail` volta a ter selectores de área e projeto.
+- **Ícones novos**: áreas usam `Layers2` (camadas), projetos usam `FolderClosed` (pasta).
+
+### Changed
+- Sidebar: PLCO logo linka para `/app/today` (antes Inbox); Navegar removido da sidebar.
+- Área clicável na sidebar/Navegar → navega para `/app/areas/[id]`; chevron separado expande/recolhe projetos.
+- Dexie schema bump v5: `area_id` adicionado de volta no índice de `tasks`.
+
+### Fixed
+- **Hydration error**: `<button>` dentro de `<button>` no `AreaList` — trocado para `<div role="button">` com chevron separado.
+
 ## [0.3.0] — 2026-06-07
 
 ### Added

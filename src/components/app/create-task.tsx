@@ -84,8 +84,8 @@ function CreateTaskForm({ section, areaId, projectId, onCreated, onClose }: Crea
       title: title.trim(),
       description: description || null,
       section,
-      area_id: areaId ?? null,
       project_id: projectId ?? null,
+      area_id: areaId ?? null,
     });
 
     if (typeof navigator !== "undefined" && navigator.onLine) {
