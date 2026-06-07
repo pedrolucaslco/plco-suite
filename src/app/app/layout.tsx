@@ -5,6 +5,7 @@ import { BottomDock } from "@/components/app/bottom-dock";
 import { NucleusSelector } from "@/components/app/nucleus-selector";
 import { CreateTaskFab, type Section } from "@/components/app/create-task";
 import { PullToRefresh } from "@/components/app/pull-to-refresh";
+import { useRealtimeSync } from "@/hooks/use-realtime-sync";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useScrollInputIntoView } from "@/hooks/use-scroll-input-into-view";
@@ -36,6 +37,8 @@ export default function AppLayout({
   const contextProjectId = projectMatch?.[1] ?? null;
 
   useScrollInputIntoView();
+
+  useRealtimeSync(useNucleusStore((s) => s.currentNucleusId));
 
   useEffect(() => {
     useNucleusStore.getState().hydrate();
