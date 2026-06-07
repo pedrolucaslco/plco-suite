@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.3.0] — 2026-06-07
+
+### Added
+- **Áreas e Projetos dinâmicos**: CRUD completo com criação inline na página Navegar, listagem clicável, e páginas de detalhe (`/app/areas/[id]`, `/app/projects/[id]`) com lista de tarefas filtrada
+- **FAB com contexto**: CreateTaskFab herda `area_id`/`project_id` automaticamente quando usado dentro de páginas de área/projeto
+- **TaskDetail com área/projeto**: seletor de área e projeto no painel de edição de tarefa, com loading de listas do IndexedDB
+- **useAreas / useProjects hooks**: hooks local-first com CRUD completo + enfileiramento de sync para áreas e projetos
+- **Sync engine generalizado**: suporte a múltiplos tipos de entidade (`task`, `area`, `project`) com push/pull/conflict/initialPull para cada tipo
+- **Dexie schema v3**: novas tabelas `areas` e `projects` com índices, migração automática de `sync_queue` (`task_id` → `entity_id`, `entity_type`)
+- **Páginas de entidade**: layout do app oculta header em páginas de área/projeto, exibindo apenas back button + nome da entidade
+
+### Changed
+- Sync engine refatorado para operar sobre qualquer entidade (task/area/project) via `entityType`
+- `syncEngine.enqueue` agora exige `entityType` como segundo parâmetro
+- `syncEngine.resolveConflict` aceita `entityType` opcional
+- `CreateTaskForm` aceita `areaId`/`projectId` e passa ao criar tarefa no Dexie + sync
+
+### Fixed
+- Header do layout escondido em páginas de área/projeto (estava exibindo título da seção incorretamente)
+- Comentário `eslint-disable` desnecessário removido do task-detail
+
 ## [0.2.0] — 2026-06-07
 
 ### Added

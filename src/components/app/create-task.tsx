@@ -20,11 +20,13 @@ export type Section = "inbox" | "today" | "upcoming" | "anytime" | "someday";
 
 interface CreateTaskFormProps {
   section: Section;
+  areaId?: string | null;
+  projectId?: string | null;
   onCreated: () => void;
   onClose: () => void;
 }
 
-function CreateTaskForm({ section, onCreated, onClose }: CreateTaskFormProps) {
+function CreateTaskForm({ section, areaId, projectId, onCreated, onClose }: CreateTaskFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
@@ -64,8 +66,8 @@ function CreateTaskForm({ section, onCreated, onClose }: CreateTaskFormProps) {
       description: description || null,
       section,
       due_date: null,
-      project_id: null,
-      area_id: null,
+      project_id: projectId ?? null,
+      area_id: areaId ?? null,
       is_completed: false,
       completed_at: null,
       position: null,
@@ -76,12 +78,14 @@ function CreateTaskForm({ section, onCreated, onClose }: CreateTaskFormProps) {
       _server_updated_at: now,
     });
 
-    await syncEngine.enqueue(taskId, "insert", {
+    await syncEngine.enqueue(taskId, "task", "insert", {
       nuclei_id: nucleusId,
       created_by: profile.id,
       title: title.trim(),
       description: description || null,
       section,
+      area_id: areaId ?? null,
+      project_id: projectId ?? null,
     });
 
     if (typeof navigator !== "undefined" && navigator.onLine) {
@@ -121,10 +125,14 @@ function CreateTaskForm({ section, onCreated, onClose }: CreateTaskFormProps) {
 // Dialog + trigger as inline text link (used in empty states)
 export function CreateTaskTrigger({
   section,
+  areaId,
+  projectId,
   onCreated,
   children,
 }: {
   section: Section;
+  areaId?: string | null;
+  projectId?: string | null;
   onCreated: () => void;
   children: React.ReactNode;
 }) {
@@ -140,6 +148,8 @@ export function CreateTaskTrigger({
         </DialogHeader>
         <CreateTaskForm
           section={section}
+          areaId={areaId}
+          projectId={projectId}
           onCreated={onCreated}
           onClose={() => setOpen(false)}
         />
@@ -151,9 +161,13 @@ export function CreateTaskTrigger({
 // Floating Action Button
 export function CreateTaskFab({
   section,
+  areaId,
+  projectId,
   onCreated,
 }: {
   section: Section;
+  areaId?: string | null;
+  projectId?: string | null;
   onCreated: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -173,6 +187,8 @@ export function CreateTaskFab({
           </DialogHeader>
           <CreateTaskForm
             section={section}
+            areaId={areaId}
+            projectId={projectId}
             onCreated={onCreated}
             onClose={() => setOpen(false)}
           />

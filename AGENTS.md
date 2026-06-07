@@ -116,6 +116,45 @@ src/components/
 
 ---
 
+---
+
+## Procedimento de Commit
+
+Sempre que o usuário pedir para fazer commit, siga **rigorosamente** esta ordem:
+
+### 1. Atualizar CHANGELOG.md
+- Adicione uma entrada com a **nova versão**, data, e todas as mudanças categorizadas em:
+  - `### Added` — novas funcionalidades
+  - `### Changed` — alterações em funcionalidades existentes
+  - `### Fixed` — correções de bugs
+  - `### Removed` — funcionalidades removidas
+- O texto deve estar pronto para copiar manualmente para uma release no GitHub
+
+### 2. Atualizar versões
+- **`package.json`**: incremente o campo `"version"` seguindo semver (`0.1.0` → `0.2.0` → etc.)
+- **`src/components/app/settings-sheet.tsx`**: sincronize a constante `APP_VERSION` com o valor de `package.json`
+
+### 3. Fazer commit
+- **Conventional Commit Pattern** obrigatório:
+  - `feat:` — nova funcionalidade
+  - `fix:` — correção de bug
+  - `refactor:` — refatoração sem mudança de comportamento
+  - `perf:` — otimização de performance
+  - `docs:` — documentação
+  - `chore:` — tarefas de manutenção (build, deps, config)
+- Mensagem clara e concisa (máximo ~72 chars no título)
+- Use `git add -A` para stage de todos os arquivos
+
+### 4. Criar tag de versão
+- `git tag -a v*.*.* -m "v*.*.* — resumo curto"`
+- Exemplo: `git tag -a v0.2.0 -m "v0.2.0 — Overdue filter, iOS keyboard fix, hydration fix"`
+
+### 5. Verificar
+- `git status` deve mostrar working tree limpo
+- `git log --oneline -3` para confirmar o commit
+
+---
+
 ## Ordem de Leitura para Novos Agentes
 
 1. `DRAFTS.md` — visão geral do produto

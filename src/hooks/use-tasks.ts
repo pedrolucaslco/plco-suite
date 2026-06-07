@@ -146,7 +146,7 @@ export function useTasks(section: string) {
       };
 
       await db.tasks.add(task);
-      await syncEngine.enqueue(task.id, "insert", {
+      await syncEngine.enqueue(task.id, "task", "insert", {
         nuclei_id: nucleusId,
         created_by: profileId,
         title: data.title,
@@ -173,7 +173,7 @@ export function useTasks(section: string) {
         _local_mtime: Date.now(),
       });
 
-      await syncEngine.enqueue(id, "update", payload);
+      await syncEngine.enqueue(id, "task", "update", payload);
 
       if (navigator.onLine) {
         syncEngine.pushPending();
@@ -184,7 +184,7 @@ export function useTasks(section: string) {
 
   const removeTask = useCallback(async (id: string) => {
     await db.tasks.delete(id);
-    await syncEngine.enqueue(id, "delete", {});
+    await syncEngine.enqueue(id, "task", "delete", {});
 
     if (navigator.onLine) {
       syncEngine.pushPending();
@@ -200,7 +200,7 @@ export function useTasks(section: string) {
           _sync: "pending",
           _local_mtime: Date.now(),
         });
-        await syncEngine.enqueue(u.id, "update", { position: u.position });
+        await syncEngine.enqueue(u.id, "task", "update", { position: u.position });
       }
 
       if (navigator.onLine) {

@@ -28,6 +28,11 @@ export default function AppLayout({
   const title = sectionLabels[sectionSlug] ?? "PLCO";
   const isOnboarding = pathname.includes("onboarding");
   const isNavegar = pathname === "/app/navegar";
+  const isEntityView = pathname.startsWith("/app/areas/") || pathname.startsWith("/app/projects/");
+  const areaMatch = pathname.match(/^\/app\/areas\/([^/]+)/);
+  const projectMatch = pathname.match(/^\/app\/projects\/([^/]+)/);
+  const contextAreaId = areaMatch?.[1] ?? null;
+  const contextProjectId = projectMatch?.[1] ?? null;
 
   useScrollInputIntoView();
 
@@ -39,7 +44,7 @@ export default function AppLayout({
     <div className="flex flex-1 h-full pb-14 lg:pb-0">
       <Sidebar />
       <main className="flex-1 flex flex-col overflow-hidden">
-        {!isOnboarding && !isNavegar && (
+        {!isOnboarding && !isNavegar && !isEntityView && (
           <header className="flex items-center justify-between px-4 lg:px-6 py-3 border-b border-hairline bg-surface/80 backdrop-blur-sm sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <h1 className="text-subheading text-ink">{title}</h1>
@@ -56,6 +61,8 @@ export default function AppLayout({
           <BottomDock />
           <CreateTaskFab
             section={sectionSlug as Section}
+            areaId={contextAreaId}
+            projectId={contextProjectId}
             onCreated={() => router.refresh()}
           />
         </>
