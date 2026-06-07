@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
   Star,
   Calendar,
@@ -15,6 +15,8 @@ import {
   Plus,
   Pencil,
   GripVertical,
+  RefreshCw,
+  Check,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAreas } from "@/hooks/use-areas";
 import { useProjects } from "@/hooks/use-projects";
+import { syncEngine } from "@/lib/sync/sync-engine";
 
 const sections: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Hoje", href: "/app/today", icon: Star },
@@ -161,6 +164,19 @@ export function Sidebar() {
   const [editName, setEditName] = useState("");
   const { addArea, updateArea } = useAreas();
   const { addProject, updateProject } = useProjects();
+  const [syncing, setSyncing] = useState(false);
+  const [syncOk, setSyncOk] = useState(false);
+
+  const handleSync = useCallback(async () => {
+    if (!nucleusId || syncing) return;
+    setSyncing(true);
+    setSyncOk(false);
+    await syncEngine.pushPending();
+    await syncEngine.pullRemote(nucleusId);
+    setSyncing(false);
+    setSyncOk(true);
+    setTimeout(() => setSyncOk(false), 3000);
+  }, [nucleusId, syncing]);
   const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -372,6 +388,24 @@ export function Sidebar() {
           )}
         </div>
       </nav>
+
+      <div className="px-2 pb-3 pt-1 border-t border-hairline">
+        <button
+          type="button"
+          onClick={handleSync}
+          disabled={syncing}
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-body text-ink-mid hover:text-ink hover:bg-muted/50 transition-colors disabled:opacity-50"
+        >
+          {syncing ? (
+            <RefreshCw size={16} className="animate-spin" />
+          ) : syncOk ? (
+            <Check size={16} className="text-green-600" />
+          ) : (
+            <RefreshCw size={16} />
+          )}
+          {syncing ? "Sincronizando..." : syncOk ? "Sincronizado!" : "Sincronizar"}
+        </button>
+      </div>
 
       <Dialog
         open={!!editTarget}

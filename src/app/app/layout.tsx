@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/app/sidebar";
 import { BottomDock } from "@/components/app/bottom-dock";
 import { NucleusSelector } from "@/components/app/nucleus-selector";
 import { CreateTaskFab, type Section } from "@/components/app/create-task";
+import { PullToRefresh } from "@/components/app/pull-to-refresh";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useScrollInputIntoView } from "@/hooks/use-scroll-input-into-view";
@@ -52,9 +53,9 @@ export default function AppLayout({
             </div>
           </header>
         )}
-        <div className="flex-1 overflow-y-auto">
+        <PullToRefresh>
           {children}
-        </div>
+        </PullToRefresh>
       </main>
       {!isOnboarding && (
         <>

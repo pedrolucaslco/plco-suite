@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0] — 2026-06-07
+
+### Added
+- **Sync na sidebar (desktop)**: botão "Sincronizar" na parte inferior da sidebar, com feedback visual de loading e confirmação
+- **Pull-to-refresh (mobile)**: gesto de puxar para baixo nas views do app dispara sincronização manual (push + pull), com indicador visual de distância e loading
+
 ## [0.5.0] — 2026-06-07
 
 ### Added
