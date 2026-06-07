@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0] — 2026-06-07
+
+### Added
+- **Sincronização manual**: botão "Sincronizar dados" no painel de Configurações que força push de alterações pendentes + pull do servidor, com feedback visual de sucesso/erro
+- **Cache reload completo**: botão "Recarregar PWA (limpar cache)" agora também apaga todos os bancos IndexedDB, localStorage, sessionStorage e caches de SW, preservando apenas autenticação Supabase (`sb-*`) e núcleo ativo — equivalente a reinstalar o app do zero e repuxar tudo da nuvem
+
+### Changed
+- SettingsSheet: botão de recarregar renomeado para "Recarregar PWA (limpar cache)" e ampliado para limpeza total do cache local
+
 ## [0.4.0] — 2026-06-07
 
 ### Added
