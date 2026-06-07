@@ -147,11 +147,20 @@ export function useTasks(section: string) {
 
       await db.tasks.add(task);
       await syncEngine.enqueue(task.id, "task", "insert", {
+        id: task.id,
         nuclei_id: nucleusId,
         created_by: profileId,
         title: data.title,
         description: data.description ?? null,
         section,
+        due_date: null,
+        project_id: null,
+        area_id: null,
+        is_completed: false,
+        completed_at: null,
+        position: tasks.length,
+        created_at: now,
+        updated_at: now,
       });
 
       if (navigator.onLine) {

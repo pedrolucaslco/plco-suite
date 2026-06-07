@@ -79,13 +79,20 @@ function CreateTaskForm({ section, areaId, projectId, onCreated, onClose }: Crea
     });
 
     await syncEngine.enqueue(taskId, "task", "insert", {
+      id: taskId,
       nuclei_id: nucleusId,
       created_by: profile.id,
       title: title.trim(),
       description: description || null,
       section,
+      due_date: null,
       project_id: projectId ?? null,
       area_id: areaId ?? null,
+      is_completed: false,
+      completed_at: null,
+      position: null,
+      created_at: now,
+      updated_at: now,
     });
 
     if (typeof navigator !== "undefined" && navigator.onLine) {

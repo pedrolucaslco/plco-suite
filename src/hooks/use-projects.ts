@@ -65,9 +65,12 @@ export function useProjects() {
 
       await db.projects.add(project);
       await syncEngine.enqueue(project.id, "project", "insert", {
+        id: project.id,
         nuclei_id: nucleusId,
         name,
         area_id: areaId ?? null,
+        position: projects.length,
+        created_at: now,
       });
 
       if (navigator.onLine) syncEngine.pushPending();

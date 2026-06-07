@@ -64,8 +64,11 @@ export function useAreas() {
 
       await db.areas.add(area);
       await syncEngine.enqueue(area.id, "area", "insert", {
+        id: area.id,
         nuclei_id: nucleusId,
         name,
+        position: areas.length,
+        created_at: now,
       });
 
       if (navigator.onLine) syncEngine.pushPending();

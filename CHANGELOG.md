@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0] — 2026-06-07
+
+### Fixed
+- **Sincronização entre dispositivos**: todos os inserts (`task`, `area`, `project`) agora incluem `id` no payload enviado ao Supabase. Antes, o servidor gerava um UUID diferente, fazendo com que as entradas locais e remotas nunca correspondessem — resultando em tarefas "órfãs" que desapareciam ou duplicavam entre dispositivos.
+- **`pushPending`**: `.insert()` agora usa `.select()` para capturar o `updated_at` do servidor e atualizar `_server_updated_at` local imediatamente, evitando re-sincronização desnecessária no próximo pull.
+- **Payloads completos**: todos os campos (incluindo `position`, `due_date`, `project_id`, `area_id`, `created_at`, `updated_at`) agora são enviados nos inserts, eliminando perda de dados ao sincronizar.
+
 ## [0.7.0] — 2026-06-07
 
 ### Added
