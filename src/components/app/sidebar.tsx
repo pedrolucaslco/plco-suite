@@ -8,6 +8,7 @@ import {
   Calendar,
   Circle,
   Diamond,
+  Inbox,
   Layers2,
   FolderClosed,
   ChevronDown,
@@ -17,6 +18,7 @@ import {
   GripVertical,
   RefreshCw,
   Check,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,8 +37,10 @@ import { useAreas } from "@/hooks/use-areas";
 import { useProjects } from "@/hooks/use-projects";
 import { syncEngine } from "@/lib/sync/sync-engine";
 import { draggedTaskId } from "@/lib/drag-state";
+import { SettingsSheet } from "./settings-sheet";
 
 const sections: { label: string; href: string; icon: LucideIcon }[] = [
+  { label: "Inbox", href: "/app/inbox", icon: Inbox },
   { label: "Hoje", href: "/app/today", icon: Star },
   { label: "Em Breve", href: "/app/upcoming", icon: Calendar },
   { label: "Qualquer Hora", href: "/app/anytime", icon: Circle },
@@ -168,6 +172,7 @@ export function Sidebar() {
   const [syncing, setSyncing] = useState(false);
   const [syncOk, setSyncOk] = useState(false);
   const [dragOverSection, setDragOverSection] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleSectionDragOver = useCallback((e: React.DragEvent, section: string) => {
     if (!draggedTaskId) return;
@@ -427,7 +432,7 @@ export function Sidebar() {
         </div>
       </nav>
 
-      <div className="px-2 pb-3 pt-1 border-t border-hairline">
+      <div className="px-2 pb-3 pt-1 border-t border-hairline space-y-0.5">
         <button
           type="button"
           onClick={handleSync}
@@ -443,7 +448,17 @@ export function Sidebar() {
           )}
           {syncing ? "Sincronizando..." : syncOk ? "Sincronizado!" : "Sincronizar"}
         </button>
+        <button
+          type="button"
+          onClick={() => setSettingsOpen(true)}
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-body text-ink-mid hover:text-ink hover:bg-muted/50 transition-colors"
+        >
+          <Settings size={16} />
+          Configurações
+        </button>
       </div>
+
+      <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
 
       <Dialog
         open={!!editTarget}

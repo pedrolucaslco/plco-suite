@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.1] — 2026-06-07
+
+### Added
+- **Inbox na sidebar desktop**: seção Inbox adicionada à sidebar (antes só aparecia no mobile via Navegar)
+- **Configurações na sidebar desktop**: botão "Configurações" na sidebar abre o mesmo modal de configurações disponível no mobile
+
 ## [0.9.0] — 2026-06-07
 
 ### Added
