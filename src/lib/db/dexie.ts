@@ -36,8 +36,8 @@ const db = new Dexie("plco") as Dexie & {
   sync_queue: EntityTable<SyncQueueItem, "id">;
 };
 
-db.version(1).stores({
-  tasks: "id, nuclei_id, section, _sync, _local_mtime",
+db.version(2).stores({
+  tasks: "id, nuclei_id, section, due_date, _sync, _local_mtime",
   sync_queue: "++id, task_id, created_at",
 });
 

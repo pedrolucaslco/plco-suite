@@ -20,21 +20,31 @@ export function useTasks(section: string) {
   useEffect(() => {
     if (!nucleusId) return;
 
-    db.tasks
-      .where({ nuclei_id: nucleusId, section })
-      .toArray()
-      .then((result) => {
-        setTasks(result.sort((a, b) => (a.position ?? 999) - (b.position ?? 999)));
-      });
+    function sortTasks(list: LocalTask[]) {
+      return list.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+    }
 
-    const sub = liveQuery(() =>
-      db.tasks
-        .where({ nuclei_id: nucleusId, section })
-        .toArray(),
-    ).subscribe({
-      next: (result) => {
-        setTasks(result.sort((a, b) => (a.position ?? 999) - (b.position ?? 999)));
-      },
+    function makeQuery() {
+      const todayStr = new Date().toISOString().split("T")[0];
+      const base = db.tasks.where("nuclei_id").equals(nucleusId!);
+
+      if (section === "today") {
+        return base.filter(
+          (t) =>
+            t.section === "today" ||
+            (t.due_date != null && t.due_date.split("T")[0] <= todayStr),
+        );
+      }
+
+      return base.filter((t) => t.section === section);
+    }
+
+    makeQuery()
+      .toArray()
+      .then((result) => setTasks(sortTasks(result)));
+
+    const sub = liveQuery(() => makeQuery().toArray()).subscribe({
+      next: (result) => setTasks(sortTasks(result)),
       error: () => {},
     });
 

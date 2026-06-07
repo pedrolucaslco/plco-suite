@@ -77,6 +77,7 @@ export function TaskSection({ section }: TaskSectionProps) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const nucleusId = useNucleusStore((s) => s.currentNucleusId);
+  const hydrated = useNucleusStore((s) => s.hydrated);
 
   const {
     tasks,
@@ -153,17 +154,17 @@ export function TaskSection({ section }: TaskSectionProps) {
       {activeTasks.length === 0 && completedTasks.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <p className="text-body text-ink-muted">
-            {nucleusId ? "Nenhuma tarefa aqui" : "Núcleo não selecionado"}
+            {!hydrated ? "Núcleo não selecionado" : nucleusId ? "Nenhuma tarefa aqui" : "Núcleo não selecionado"}
           </p>
           <p className="text-caption text-ink-muted mt-1">
-            {nucleusId ? (
+            {!hydrated || !nucleusId ? (
+              "Selecione ou crie um núcleo familiar"
+            ) : (
               <CreateTaskTrigger section={section} onCreated={() => {}}>
                 <span className="text-primary hover:underline">
                   Adicionar primeira tarefa
                 </span>
               </CreateTaskTrigger>
-            ) : (
-              "Selecione ou crie um núcleo familiar"
             )}
           </p>
         </div>

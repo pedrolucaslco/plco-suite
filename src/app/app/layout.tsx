@@ -5,6 +5,9 @@ import { BottomDock } from "@/components/app/bottom-dock";
 import { NucleusSelector } from "@/components/app/nucleus-selector";
 import { CreateTaskFab, type Section } from "@/components/app/create-task";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useScrollInputIntoView } from "@/hooks/use-scroll-input-into-view";
+import { useNucleusStore } from "@/stores/nucleus";
 
 const sectionLabels: Record<string, string> = {
   inbox: "Inbox",
@@ -25,6 +28,12 @@ export default function AppLayout({
   const title = sectionLabels[sectionSlug] ?? "PLCO";
   const isOnboarding = pathname.includes("onboarding");
   const isNavegar = pathname === "/app/navegar";
+
+  useScrollInputIntoView();
+
+  useEffect(() => {
+    useNucleusStore.getState().hydrate();
+  }, []);
 
   return (
     <div className="flex flex-1 h-full pb-14 lg:pb-0">

@@ -11,7 +11,7 @@ import { createClient } from "@/lib/db/client";
 import { useRouter } from "next/navigation";
 
 const CACHE_VERSION_KEY = "plco-cache-version";
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "0.2.0";
 
 function getCacheVersion(): string {
   if (typeof window === "undefined") return APP_VERSION;
