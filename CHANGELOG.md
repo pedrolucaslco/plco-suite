@@ -1,15 +1,5 @@
 # Changelog
 
-## [0.10.0] — 2026-06-09
-
-### Changed
-- **Navegar view**: projetos dentro de áreas agora usam a mesma hierarquia visual da sidebar — linha conectora (`border-l`), `GripVertical` com `group-hover` para drag, e botão editar com `opacity-0 group-hover:opacity-100`. Projetos independentes também padronizados com o mesmo estilo.
-
-### Fixed
-- **Auth com Server Actions**: login e registro refatorados de `useState`/`createClient` para `useActionState` com server actions, eliminando erro de hidratação e melhorando segurança.
-- **Cookie handling**: `client.ts` agora declara `"use client"` e implementa `getAll`/`setAll` baseados em `document.cookie`. `server.ts` e `middleware.ts` usam `secure: false` para compatibilidade com ambiente local.
-- **Bottom dock**: altura reduzida de `h-14` para `h-11` para melhor proporção em mobile.
-
 ## [0.9.2] — 2026-06-07
 
 ### Fixed

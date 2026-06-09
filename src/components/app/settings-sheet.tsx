@@ -13,7 +13,7 @@ import { useNucleusStore } from "@/stores/nucleus";
 import { syncEngine } from "@/lib/sync/sync-engine";
 
 const CACHE_VERSION_KEY = "plco-cache-version";
-const APP_VERSION = "0.10.0";
+const APP_VERSION = "0.9.2";
 
 function getCacheVersion(): string {
   if (typeof window === "undefined") return APP_VERSION;

@@ -15,7 +15,7 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, { ...options, secure: false });
+            cookieStore.set(name, value, options);
           }
         },
       },

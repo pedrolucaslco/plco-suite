@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
           }
           supabaseResponse = NextResponse.next({ request });
           for (const { name, value, options } of cookiesToSet) {
-            supabaseResponse.cookies.set(name, value, { ...options, secure: false });
+            supabaseResponse.cookies.set(name, value, options);
           }
         },
       },
