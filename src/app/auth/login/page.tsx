@@ -1,39 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/db/client";
+import { useActionState } from "react";
+import { login } from "./actions";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const supabase = createClient();
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
-
-    router.push("/app");
-    router.refresh();
-  }
+  const [state, formAction, pending] = useActionState(login, { error: null });
 
   return (
-    <form onSubmit={handleLogin} className="space-y-6">
+    <form action={formAction} className="space-y-6">
       <div className="text-center space-y-2">
         <h1 className="text-heading font-bold text-ink">Entrar</h1>
         <p className="text-body text-ink-muted">
@@ -41,26 +15,24 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {error && (
+      {state?.error && (
         <p className="text-sm text-deadline bg-deadline/10 rounded-md px-3 py-2">
-          {error}
+          {state.error}
         </p>
       )}
 
       <div className="space-y-4">
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           required
           className="w-full h-10 px-3 rounded-md border border-hairline bg-surface text-ink text-body placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
         />
         <input
           type="password"
+          name="password"
           placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           required
           className="w-full h-10 px-3 rounded-md border border-hairline bg-surface text-ink text-body placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
         />
@@ -68,10 +40,10 @@ export default function LoginPage() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={pending}
         className="w-full h-10 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 disabled:opacity-50 transition-colors"
       >
-        {loading ? "Entrando..." : "Entrar"}
+        {pending ? "Entrando..." : "Entrar"}
       </button>
 
       <p className="text-center text-sm text-ink-muted">

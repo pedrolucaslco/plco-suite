@@ -191,21 +191,39 @@ export default function NavegarPage() {
                       <Pencil size={15} />
                     </button>
                   </div>
-                  {isExpanded && areaProjects.map((p) => (
-                    <Link
-                      key={p.id}
-                      href={`/app/projects/${p.id}`}
-                      className={cn(
-                        "flex items-center gap-3 pl-12 pr-4 lg:pr-6 py-3 border-b border-hairline transition-colors",
-                        pathname === `/app/projects/${p.id}`
-                          ? "bg-muted/50 text-ink font-medium"
-                          : "text-ink-mid hover:text-ink hover:bg-muted/30 active:bg-muted/50",
-                      )}
-                    >
-                      <FolderClosed size={18} className="shrink-0" />
-                      <span className="text-body">{p.name}</span>
-                    </Link>
-                  ))}
+                  {isExpanded && (
+                    <div className="ml-5 border-l border-hairline pl-2 mb-1 space-y-0.5">
+                      {areaProjects.map((p) => (
+                        <div
+                          key={p.id}
+                          className="group flex items-center gap-1 rounded-md"
+                          draggable
+                          onDragStart={() => { draggedProjectId = p.id; }}
+                        >
+                          <Link
+                            href={`/app/projects/${p.id}`}
+                            className={cn(
+                              "flex items-center gap-2 px-2 py-2 rounded-md text-body transition-colors flex-1 min-w-0",
+                              pathname === `/app/projects/${p.id}`
+                                ? "bg-muted text-ink font-medium"
+                                : "text-ink-mid hover:text-ink hover:bg-muted/50",
+                            )}
+                          >
+                            <GripVertical size={14} className="shrink-0 text-ink-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <FolderClosed size={16} className="shrink-0" />
+                            <span className="truncate">{p.name}</span>
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => handleEdit("project", p.id, p.name)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-ink-mid hover:text-ink shrink-0"
+                          >
+                            <Pencil size={15} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -222,27 +240,27 @@ export default function NavegarPage() {
             {standaloneProjects.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center gap-3 px-4 lg:px-6 py-3 border-b border-hairline"
+                className="group flex items-center gap-1 px-4 lg:px-6 py-2 border-b border-hairline rounded-md"
                 draggable
                 onDragStart={() => { draggedProjectId = p.id; }}
               >
-                <GripVertical size={16} className="shrink-0 text-ink-muted" />
+                <GripVertical size={14} className="shrink-0 text-ink-muted opacity-50 group-hover:opacity-100 transition-opacity" />
                 <Link
                   href={`/app/projects/${p.id}`}
                   className={cn(
-                    "flex items-center gap-3 flex-1 min-w-0 transition-colors",
+                    "flex items-center gap-2 px-2 py-2 rounded-md text-body transition-colors flex-1 min-w-0",
                     pathname === `/app/projects/${p.id}`
-                      ? "text-ink font-medium"
-                      : "text-ink-mid hover:text-ink",
+                      ? "bg-muted text-ink font-medium"
+                      : "text-ink-mid hover:text-ink hover:bg-muted/50",
                   )}
                 >
-                  <FolderClosed size={20} className="shrink-0" />
-                  <span className="text-body text-ink flex-1 truncate">{p.name}</span>
+                  <FolderClosed size={16} className="shrink-0" />
+                  <span className="truncate">{p.name}</span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => handleEdit("project", p.id, p.name)}
-                  className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-ink-mid hover:text-ink shrink-0"
                 >
                   <Pencil size={15} />
                 </button>

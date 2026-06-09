@@ -22,7 +22,7 @@ export function BottomDock() {
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-hairline pb-safe">
-      <div className="flex items-center justify-around h-14 px-2">
+      <div className="flex items-center justify-around h-11 px-2">
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || pathname.startsWith(item.href);
