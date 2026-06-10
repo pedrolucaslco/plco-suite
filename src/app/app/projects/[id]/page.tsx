@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Briefcase } from "lucide-react";
+import { IconArrowLeft, IconBriefcaseFilled } from "@tabler/icons-react";
 import { useNucleusStore } from "@/stores/nucleus";
 import { db, type LocalProject, type LocalTask } from "@/lib/db/dexie";
 import { TaskRow } from "@/components/app/task-row";
@@ -43,16 +43,16 @@ export default function ProjectPage() {
 
   return (
     <>
-      <div className="flex flex-col">
-        <div className="px-4 lg:px-6 py-3 border-b border-hairline bg-surface flex items-center gap-3">
+      <div className="flex flex-col bg-white">
+        <div className="px-4 lg:px-6 py-3 border-b border-hairline bg-canvas flex items-center gap-3">
           <button
             type="button"
             onClick={() => router.back()}
             className="flex items-center justify-center size-8 rounded-md text-ink-mid hover:text-ink hover:bg-muted/50 transition-colors"
           >
-            <ArrowLeft size={20} />
+            <IconArrowLeft size={20} />
           </button>
-          <Briefcase size={20} className="text-ink-mid shrink-0" />
+            <IconBriefcaseFilled size={20} className="text-ink-mid shrink-0" />
           <h1 className="text-subheading text-ink">
             {project?.name ?? "Carregando..."}
           </h1>

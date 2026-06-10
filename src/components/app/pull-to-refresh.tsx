@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { RefreshCw } from "lucide-react";
+import { IconRefresh } from "@tabler/icons-react";
 import { syncEngine } from "@/lib/sync/sync-engine";
 import { useNucleusStore } from "@/stores/nucleus";
 
@@ -61,9 +61,7 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
           style={{ height: pullDistance }}
         >
           {state === "syncing" ? (
-            <RefreshCw size={20} className="animate-spin text-primary" />
-          ) : pullDistance >= THRESHOLD ? (
-            <RefreshCw size={20} className="text-primary" />
+            <IconRefresh size={20} className="animate-spin text-primary" />
           ) : (
             <div className="w-0.5 h-6 rounded-full bg-hairline" />
           )}

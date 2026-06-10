@@ -3,25 +3,27 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Inbox,
-  Star,
-  Calendar,
-  Compass,
-} from "lucide-react";
+  IconInbox,
+  IconStarFilled,
+  IconCalendarFilled,
+  IconCalendarMonthFilled,
+  IconCompassFilled,
+} from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { label: "Inbox", href: "/app/inbox", icon: Inbox },
-  { label: "Hoje", href: "/app/today", icon: Star },
-  { label: "Breve", href: "/app/upcoming", icon: Calendar },
-  { label: "Navegar", href: "/app/navegar", icon: Compass },
+  { label: "Inbox", href: "/app/inbox", icon: IconInbox },
+  { label: "Hoje", href: "/app/today", icon: IconStarFilled },
+  { label: "Breve", href: "/app/upcoming", icon: IconCalendarFilled },
+  { label: "Calendário", href: "/app/calendar", icon: IconCalendarMonthFilled },
+  { label: "Navegar", href: "/app/navegar", icon: IconCompassFilled },
 ];
 
 export function BottomDock() {
   const pathname = usePathname();
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-hairline pb-safe">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-canvas/95 backdrop-blur-md border-t border-hairline pb-safe">
       <div className="flex items-center justify-around h-14 px-2">
         {items.map((item) => {
           const Icon = item.icon;

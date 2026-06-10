@@ -1,113 +1,35 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import { liveQuery } from "dexie";
+import { useCallback, useMemo } from "react";
 import { db, type LocalTask } from "@/lib/db/dexie";
 import { syncEngine } from "@/lib/sync/sync-engine";
 import { createClient } from "@/lib/db/client";
 import { useNucleusStore } from "@/stores/nucleus";
+import { useTaskStore } from "@/stores/tasks";
 
 export type SyncState = "synced" | "syncing" | "error" | "offline" | "conflict";
 
 export function useTasks(section: string) {
-  const [tasks, setTasks] = useState<LocalTask[]>([]);
-  const [syncState, setSyncState] = useState<SyncState>("syncing");
-  const [syncError, setSyncError] = useState<string | null>(null);
   const nucleusId = useNucleusStore((s) => s.currentNucleusId);
-  const supabase = createClient();
-  const onlineRef = useRef(typeof navigator !== "undefined" ? navigator.onLine : true);
+  const allTasks = useTaskStore((s) => s.tasks);
+  const syncState = useTaskStore((s) => s.syncState);
+  const syncError = useTaskStore((s) => s.syncError);
 
-  useEffect(() => {
-    if (!nucleusId) return;
-
-    function sortTasks(list: LocalTask[]) {
-      return list.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
-    }
-
-    function makeQuery() {
-      const todayStr = new Date().toISOString().split("T")[0];
-      const base = db.tasks.where("nuclei_id").equals(nucleusId!);
-
-      if (section === "today") {
-        return base.filter(
+  const tasks = useMemo(() => {
+    if (!nucleusId) return [];
+    const todayStr = new Date().toISOString().split("T")[0];
+    const base = section === "today"
+      ? allTasks.filter(
           (t) =>
             t.section === "today" ||
             (t.due_date != null && t.due_date.split("T")[0] <= todayStr),
-        );
-      }
-
-      return base.filter((t) => t.section === section);
-    }
-
-    makeQuery()
-      .toArray()
-      .then((result) => setTasks(sortTasks(result)));
-
-    const sub = liveQuery(() => makeQuery().toArray()).subscribe({
-      next: (result) => setTasks(sortTasks(result)),
-      error: () => {},
-    });
-
-    return () => sub.unsubscribe();
-  }, [nucleusId, section]);
-
-  useEffect(() => {
-    if (!nucleusId) return;
-
-    syncEngine.initialPull(nucleusId);
-
-    const unsub = syncEngine.subscribe((event) => {
-      switch (event.type) {
-        case "syncing":
-          setSyncState("syncing");
-          break;
-        case "synced":
-          setSyncState("synced");
-          setSyncError(null);
-          break;
-        case "error":
-          setSyncState("error");
-          setSyncError(event.message);
-          break;
-        case "conflict":
-          setSyncState("conflict");
-          break;
-      }
-    });
-
-    const interval = setInterval(() => {
-      if (navigator.onLine) {
-        syncEngine.pullRemote(nucleusId);
-      }
-    }, 30000);
-
-    return () => {
-      unsub();
-      clearInterval(interval);
-    };
-  }, [nucleusId]);
-
-  useEffect(() => {
-    function handleOnline() {
-      onlineRef.current = true;
-      setSyncState("syncing");
-      syncEngine.pushPending();
-      if (nucleusId) syncEngine.pullRemote(nucleusId);
-    }
-    function handleOffline() {
-      onlineRef.current = false;
-      setSyncState("offline");
-    }
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, [nucleusId]);
+        )
+      : allTasks.filter((t) => t.section === section);
+    return base.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+  }, [allTasks, nucleusId, section]);
 
   const getProfileId = useCallback(async () => {
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
     const { data: profile } = await supabase
@@ -116,7 +38,7 @@ export function useTasks(section: string) {
       .eq("user_id", user.id)
       .maybeSingle();
     return profile?.id ?? null;
-  }, [supabase]);
+  }, []);
 
   const addTask = useCallback(
     async (data: { title: string; description?: string | null }) => {
@@ -137,7 +59,7 @@ export function useTasks(section: string) {
         area_id: null,
         is_completed: false,
         completed_at: null,
-        position: tasks.length,
+        position: allTasks.filter((t) => t.section === section).length,
         created_at: now,
         updated_at: now,
         _sync: "pending",
@@ -158,7 +80,7 @@ export function useTasks(section: string) {
         area_id: null,
         is_completed: false,
         completed_at: null,
-        position: tasks.length,
+        position: allTasks.filter((t) => t.section === section).length,
         created_at: now,
         updated_at: now,
       });
@@ -167,7 +89,7 @@ export function useTasks(section: string) {
         syncEngine.pushPending();
       }
     },
-    [nucleusId, section, tasks.length, getProfileId],
+    [nucleusId, section, allTasks, getProfileId],
   );
 
   const updateTask = useCallback(
@@ -202,14 +124,15 @@ export function useTasks(section: string) {
 
   const reorderTasks = useCallback(
     async (orderedIds: string[]) => {
-      const updates = orderedIds.map((id, i) => ({ id, position: i }));
-      for (const u of updates) {
-        await db.tasks.update(u.id, {
-          position: u.position,
+      for (let i = 0; i < orderedIds.length; i++) {
+        await db.tasks.update(orderedIds[i], {
+          position: i,
           _sync: "pending",
           _local_mtime: Date.now(),
         });
-        await syncEngine.enqueue(u.id, "task", "update", { position: u.position });
+        await syncEngine.enqueue(orderedIds[i], "task", "update", {
+          position: i,
+        });
       }
 
       if (navigator.onLine) {

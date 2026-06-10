@@ -59,16 +59,19 @@ class SyncEngine {
     for (const sr of serverRows) {
       const local = localMap.get(sr.id);
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { updated_at: _supabaseUpdatedAt, ...clean } = sr;
+
       if (!local) {
         await (dexieTable as any).put({
-          ...sr,
+          ...clean,
           _sync: "synced",
           _local_mtime: 0,
           _server_updated_at: sr.updated_at,
         });
       } else if (local._sync === "synced" && sr.updated_at > local._server_updated_at) {
         await (dexieTable as any).put({
-          ...sr,
+          ...clean,
           _sync: "synced",
           _local_mtime: 0,
           _server_updated_at: sr.updated_at,

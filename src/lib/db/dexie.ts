@@ -91,4 +91,11 @@ db.version(5).stores({
   }),
 );
 
+db.version(6).stores({
+  tasks: "id, nuclei_id, section, due_date, area_id, _sync, _local_mtime, _server_updated_at",
+  areas: "id, nuclei_id, _sync, _local_mtime, _server_updated_at",
+  projects: "id, nuclei_id, area_id, _sync, _local_mtime, _server_updated_at",
+  sync_queue: "++id, entity_id, entity_type, created_at",
+});
+
 export { db };

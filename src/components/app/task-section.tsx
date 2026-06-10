@@ -17,7 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
-import { AlertCircle, GripVertical, RefreshCw, WifiOff } from "lucide-react";
+import { IconAlertCircleFilled, IconGripVertical, IconRefresh, IconWifiOff } from "@tabler/icons-react";
 import { useTasks } from "@/hooks/use-tasks";
 import { useNucleusStore } from "@/stores/nucleus";
 import { TaskRow } from "./task-row";
@@ -35,9 +35,10 @@ interface SortableTaskRowProps {
   onToggle: (id: string, completed: boolean) => void;
   onSelect: (task: LocalTask) => void;
   onSectionChange: (id: string, section: string) => void;
+  currentSection: string;
 }
 
-function SortableTaskRow({ task, onToggle, onSelect, onSectionChange }: SortableTaskRowProps) {
+function SortableTaskRow({ task, onToggle, onSelect, onSectionChange, currentSection }: SortableTaskRowProps) {
   const {
     attributes,
     listeners,
@@ -60,14 +61,14 @@ function SortableTaskRow({ task, onToggle, onSelect, onSectionChange }: Sortable
     >
       <button
         type="button"
-        className="flex items-center justify-center w-8 shrink-0 cursor-grab active:cursor-grabbing text-ink-muted opacity-0 group-hover/sortable:opacity-100 transition-opacity"
+        className="md:items-center hidden md:flex justify-center w-4 shrink-0 cursor-grab active:cursor-grabbing text-ink-muted opacity-0 group-hover/sortable:opacity-100 transition-opacity"
         {...attributes}
         {...listeners}
       >
-        <GripVertical size={16} />
+        <IconGripVertical size={16} />
       </button>
       <div className="flex-1 min-w-0">
-        <TaskRow task={task} onToggle={onToggle} onSelect={onSelect} onSectionChange={onSectionChange} />
+        <TaskRow task={task} onToggle={onToggle} onSelect={onSelect} onSectionChange={onSectionChange} currentSection={currentSection} />
       </div>
     </div>
   );
@@ -135,14 +136,14 @@ export function TaskSection({ section }: TaskSectionProps) {
     <div className="flex flex-col">
       {syncState === "offline" && (
         <div className="px-4 lg:px-6 py-2 bg-amber-50/80 dark:bg-amber-950/20 border-b border-hairline flex items-center gap-2 text-caption text-amber-700 dark:text-amber-400">
-          <WifiOff size={14} />
+          <IconWifiOff size={14} />
           Offline — alterações serão sincronizadas quando você voltar online
         </div>
       )}
 
       {syncState === "syncing" && (
         <div className="px-4 lg:px-6 py-2 bg-sky-50/80 dark:bg-sky-950/20 border-b border-hairline flex items-center gap-2 text-caption text-sky-700 dark:text-sky-400">
-          <RefreshCw size={14} className="animate-spin" />
+          <IconRefresh size={14} className="animate-spin" />
           Sincronizando...
         </div>
       )}
@@ -150,32 +151,33 @@ export function TaskSection({ section }: TaskSectionProps) {
       {syncState === "error" && syncError && (
         <div className="px-4 lg:px-6 py-3">
           <p className="text-sm text-deadline bg-deadline/10 rounded-md px-3 py-2 flex items-center gap-2">
-            <AlertCircle size={14} />
+            <IconAlertCircleFilled size={14} />
             {syncError}
           </p>
         </div>
       )}
 
-      {activeTasks.length === 0 && completedTasks.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-body text-ink-muted">
-            {!hydrated ? "Núcleo não selecionado" : nucleusId ? "Nenhuma tarefa aqui" : "Núcleo não selecionado"}
-          </p>
-          <p className="text-caption text-ink-muted mt-1">
-            {!hydrated || !nucleusId ? (
-              "Selecione ou crie um núcleo familiar"
-            ) : (
-              <CreateTaskTrigger section={section} onCreated={() => {}}>
-                <span className="text-primary hover:underline">
-                  Adicionar primeira tarefa
-                </span>
-              </CreateTaskTrigger>
-            )}
-          </p>
-        </div>
-      )}
+      <div className="w-full max-w-[800px] mx-auto py-4 lg:py-32">
+        {activeTasks.length === 0 && completedTasks.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-body text-ink-muted">
+              {!hydrated ? "Núcleo não selecionado" : nucleusId ? "Nenhuma tarefa aqui" : "Núcleo não selecionado"}
+            </p>
+            <p className="text-caption text-ink-muted mt-1">
+              {!hydrated || !nucleusId ? (
+                "Selecione ou crie um núcleo familiar"
+              ) : (
+                <CreateTaskTrigger section={section} onCreated={() => {}}>
+                  <span className="text-primary hover:underline">
+                    Adicionar primeira tarefa
+                  </span>
+                </CreateTaskTrigger>
+              )}
+            </p>
+          </div>
+        )}
 
-      <DndContext
+        <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
@@ -191,6 +193,7 @@ export function TaskSection({ section }: TaskSectionProps) {
               onToggle={handleToggle}
               onSelect={handleSelect}
               onSectionChange={handleSectionChange}
+              currentSection={section}
             />
           ))}
         </SortableContext>
@@ -209,10 +212,12 @@ export function TaskSection({ section }: TaskSectionProps) {
               task={task}
               onToggle={handleToggle}
               onSelect={handleSelect}
+              currentSection={section}
             />
           ))}
         </>
       )}
+      </div>
 
       <TaskDetail
         task={selectedTask}

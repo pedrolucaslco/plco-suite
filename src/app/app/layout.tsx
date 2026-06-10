@@ -10,11 +10,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useScrollInputIntoView } from "@/hooks/use-scroll-input-into-view";
 import { useNucleusStore } from "@/stores/nucleus";
+import { useTaskSubscription } from "@/hooks/use-task-subscription";
 
 const sectionLabels: Record<string, string> = {
   inbox: "Inbox",
   today: "Hoje",
   upcoming: "Em Breve",
+  calendar: "Calendário",
   anytime: "Qualquer Hora",
   someday: "Algum Dia",
 };
@@ -39,6 +41,7 @@ export default function AppLayout({
   useScrollInputIntoView();
 
   useRealtimeSync(useNucleusStore((s) => s.currentNucleusId));
+  useTaskSubscription();
 
   useEffect(() => {
     useNucleusStore.getState().hydrate();
@@ -49,7 +52,7 @@ export default function AppLayout({
       <Sidebar />
       <main className="flex-1 flex flex-col overflow-hidden">
         {!isOnboarding && !isNavegar && !isEntityView && (
-          <header className="flex items-center justify-between px-4 lg:px-6 py-3 border-b border-hairline bg-surface/80 backdrop-blur-sm sticky top-0 z-10">
+          <header className="flex items-center justify-between px-4 lg:px-6 py-3 border-b border-hairline bg-canvas/80 backdrop-blur-sm sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <h1 className="text-subheading text-ink">{title}</h1>
               <NucleusSelector />

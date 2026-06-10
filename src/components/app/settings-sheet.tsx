@@ -6,14 +6,14 @@ import {
   SheetContent,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, RefreshCw, LogOut, Check, AlertCircle } from "lucide-react";
+import { IconReload, IconRefresh, IconLogout, IconCheckFilled, IconAlertCircleFilled } from "@tabler/icons-react";
 import { createClient } from "@/lib/db/client";
 import { useRouter } from "next/navigation";
 import { useNucleusStore } from "@/stores/nucleus";
 import { syncEngine } from "@/lib/sync/sync-engine";
 
 const CACHE_VERSION_KEY = "plco-cache-version";
-const APP_VERSION = "0.9.2";
+const APP_VERSION = "0.10.0";
 
 function getCacheVersion(): string {
   if (typeof window === "undefined") return APP_VERSION;
@@ -135,13 +135,13 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
               variant="outline"
             >
               {syncing ? (
-                <RefreshCw size={16} className="animate-spin" />
+                <IconRefresh size={16} className="animate-spin" />
               ) : syncResult === "success" ? (
-                <Check size={16} className="text-green-600" />
+                <IconCheckFilled size={16} className="text-green-600" />
               ) : syncResult === "error" ? (
-                <AlertCircle size={16} className="text-deadline" />
+                <IconAlertCircleFilled size={16} className="text-deadline" />
               ) : (
-                <RefreshCw size={16} />
+                <IconRefresh size={16} />
               )}
               {syncing
                 ? "Sincronizando..."
@@ -158,7 +158,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
               className="w-full flex items-center gap-2"
               variant="outline"
             >
-              <RotateCcw size={16} />
+              <IconReload size={16} />
               {reloading ? "Limpando tudo..." : "Recarregar PWA (limpar cache)"}
             </Button>
 
@@ -167,7 +167,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
               className="w-full flex items-center gap-2 text-deadline"
               variant="outline"
             >
-              <LogOut size={16} />
+              <IconLogout size={16} />
               Sair
             </Button>
           </div>

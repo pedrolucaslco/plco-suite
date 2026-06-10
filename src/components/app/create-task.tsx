@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { IconPlusFilled } from "@tabler/icons-react";
 import {
   Dialog,
   DialogContent,
@@ -185,7 +185,7 @@ export function CreateTaskFab({
         onClick={() => setOpen(true)}
         className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
       >
-        <Plus size={24} />
+        <IconPlusFilled size={24} />
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

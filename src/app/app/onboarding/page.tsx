@@ -91,7 +91,7 @@ export default function OnboardingPage() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="w-full h-10 px-3 rounded-md border border-hairline bg-surface text-ink text-body placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          className="w-full h-10 px-3 rounded-md border border-hairline bg-canvas text-ink text-body placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
         />
 
         <button

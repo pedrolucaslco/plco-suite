@@ -137,7 +137,7 @@ export function TaskDetail({
                 <select
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
-                  className="w-full h-9 rounded-md border border-hairline bg-surface text-ink text-body px-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-9 rounded-md border border-hairline bg-canvas text-ink text-body px-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   {SECTIONS.map((s) => (
                     <option key={s.value} value={s.value}>
@@ -154,7 +154,7 @@ export function TaskDetail({
                 <select
                   value={entityAreaId ?? ""}
                   onChange={(e) => setEntityAreaId(e.target.value || null)}
-                  className="w-full h-9 rounded-md border border-hairline bg-surface text-ink text-body px-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-9 rounded-md border border-hairline bg-canvas text-ink text-body px-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="">Sem área</option>
                   {areas.map((a) => (
@@ -172,7 +172,7 @@ export function TaskDetail({
                 <select
                   value={entityProjectId ?? ""}
                   onChange={(e) => setEntityProjectId(e.target.value || null)}
-                  className="w-full h-9 rounded-md border border-hairline bg-surface text-ink text-body px-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-9 rounded-md border border-hairline bg-canvas text-ink text-body px-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="">Sem projeto</option>
                   {projects.map((p) => (

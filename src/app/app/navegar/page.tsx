@@ -4,19 +4,19 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Settings,
-  Star,
-  Calendar,
-  Circle,
-  Diamond,
-  Layers2,
-  FolderClosed,
-  Plus,
-  ChevronDown,
-  ChevronRight,
-  Pencil,
-  GripVertical,
-} from "lucide-react";
+  IconSettingsFilled,
+  IconStarFilled,
+  IconCalendarFilled,
+  IconCircleFilled,
+  IconDiamondFilled,
+  IconStack2Filled,
+  IconFolderFilled,
+  IconPlusFilled,
+  IconChevronDownFilled,
+  IconChevronRightFilled,
+  IconPencilFilled,
+  IconGripVertical,
+} from "@tabler/icons-react";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -32,10 +32,10 @@ import { cn } from "@/lib/utils";
 let draggedProjectId: string | null = null;
 
 const sections = [
-  { label: "Hoje", href: "/app/today", icon: Star, description: "Tarefas para hoje" },
-  { label: "Em Breve", href: "/app/upcoming", icon: Calendar, description: "Tarefas com data futura" },
-  { label: "Qualquer Hora", href: "/app/anytime", icon: Circle, description: "Tarefas sem data definida" },
-  { label: "Algum Dia", href: "/app/someday", icon: Diamond, description: "Ideias e planos futuros" },
+  { label: "Hoje", href: "/app/today", icon: IconStarFilled, description: "Tarefas para hoje" },
+  { label: "Em Breve", href: "/app/upcoming", icon: IconCalendarFilled, description: "Tarefas com data futura" },
+  { label: "Qualquer Hora", href: "/app/anytime", icon: IconCircleFilled, description: "Tarefas sem data definida" },
+  { label: "Algum Dia", href: "/app/someday", icon: IconDiamondFilled, description: "Ideias e planos futuros" },
 ];
 
 export default function NavegarPage() {
@@ -108,14 +108,14 @@ export default function NavegarPage() {
   return (
     <>
       <div className="flex flex-col">
-        <div className="px-4 lg:px-6 py-3 border-b border-hairline bg-surface flex items-center justify-between">
+        <div className="px-4 lg:px-6 py-3 border-b border-hairline bg-canvas flex items-center justify-between">
           <h1 className="text-subheading text-ink">Navegar</h1>
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
             className="flex items-center justify-center size-8 rounded-md text-ink-mid hover:text-ink hover:bg-muted/50 transition-colors"
           >
-            <Settings size={18} />
+            <IconSettingsFilled size={18} />
           </button>
         </div>
 
@@ -168,7 +168,7 @@ export default function NavegarPage() {
                       className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
                     >
                       {areaProjects.length > 0 ? (
-                        isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+                        isExpanded ? <IconChevronDownFilled size={16} /> : <IconChevronRightFilled size={16} />
                       ) : (
                         <span className="w-4" />
                       )}
@@ -177,7 +177,7 @@ export default function NavegarPage() {
                       href={`/app/areas/${area.id}`}
                       className="flex items-center gap-3 flex-1 min-w-0"
                     >
-                      <Layers2 size={20} className="shrink-0 text-ink-mid" />
+                      <IconStack2Filled size={20} className="shrink-0 text-ink-mid" />
                       <span className="text-body text-ink flex-1 truncate">{area.name}</span>
                       {areaProjects.length > 0 && (
                         <span className="text-caption text-ink-muted">{areaProjects.length}</span>
@@ -188,7 +188,7 @@ export default function NavegarPage() {
                       onClick={() => handleEdit("area", area.id, area.name)}
                       className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
                     >
-                      <Pencil size={15} />
+                      <IconPencilFilled size={15} />
                     </button>
                   </div>
                   {isExpanded && areaProjects.map((p) => (
@@ -202,7 +202,7 @@ export default function NavegarPage() {
                           : "text-ink-mid hover:text-ink hover:bg-muted/30 active:bg-muted/50",
                       )}
                     >
-                      <FolderClosed size={18} className="shrink-0" />
+                      <IconFolderFilled size={18} className="shrink-0" />
                       <span className="text-body">{p.name}</span>
                     </Link>
                   ))}
@@ -226,7 +226,7 @@ export default function NavegarPage() {
                 draggable
                 onDragStart={() => { draggedProjectId = p.id; }}
               >
-                <GripVertical size={16} className="shrink-0 text-ink-muted" />
+                <IconGripVertical size={16} className="shrink-0 text-ink-muted" />
                 <Link
                   href={`/app/projects/${p.id}`}
                   className={cn(
@@ -236,7 +236,7 @@ export default function NavegarPage() {
                       : "text-ink-mid hover:text-ink",
                   )}
                 >
-                  <FolderClosed size={20} className="shrink-0" />
+                  <IconFolderFilled size={20} className="shrink-0" />
                   <span className="text-body text-ink flex-1 truncate">{p.name}</span>
                 </Link>
                 <button
@@ -244,7 +244,7 @@ export default function NavegarPage() {
                   onClick={() => handleEdit("project", p.id, p.name)}
                   className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
                 >
-                  <Pencil size={15} />
+                  <IconPencilFilled size={15} />
                 </button>
               </div>
             ))}
@@ -269,19 +269,19 @@ export default function NavegarPage() {
               onClick={() => setShowNewMenu(!showNewMenu)}
               className="flex items-center gap-3 text-ink-mid hover:text-ink transition-colors"
             >
-              <Plus size={18} />
+              <IconPlusFilled size={18} />
               <span className="text-body">Nova lista</span>
             </button>
           )}
 
           {showNewMenu && !newType && (
-            <div className="absolute left-4 right-4 bottom-full mb-1 bg-surface border border-hairline rounded-lg shadow-lg overflow-hidden z-10">
+            <div className="absolute left-4 right-4 bottom-full mb-1 bg-canvas border border-hairline rounded-lg shadow-lg overflow-hidden z-10">
               <button
                 type="button"
                 onClick={() => { setNewType("area"); setShowNewMenu(false); }}
                 className="flex items-center gap-3 w-full px-4 py-3 text-body text-ink hover:bg-muted/30 transition-colors text-left border-b border-hairline"
               >
-                <Layers2 size={18} />
+                <IconStack2Filled size={18} />
                 Nova área
               </button>
               <button
@@ -289,7 +289,7 @@ export default function NavegarPage() {
                 onClick={() => { setNewType("project"); setShowNewMenu(false); }}
                 className="flex items-center gap-3 w-full px-4 py-3 text-body text-ink hover:bg-muted/30 transition-colors text-left"
               >
-                <FolderClosed size={18} />
+                <IconFolderFilled size={18} />
                 Novo projeto
               </button>
             </div>

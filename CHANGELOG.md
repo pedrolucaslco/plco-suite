@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.10.0] — 2026-06-09
+
+### Added
+- **Visão Calendário**: nova grade mensal com `react-day-picker`, pontos indicadores nos dias com tarefas, e lista de tarefas do dia selecionado abaixo. Acesso via 5º tab no BottomDock, item na Sidebar e rota `/app/calendar`.
+- **Store centralizado de tarefas**: `stores/tasks.ts` (Zustand) alimentado por uma única `liveQuery` no layout. Páginas filtram em memória em vez de criar subscriptions próprias — navegação entre seções é instantânea sem remontagem de queries IndexedDB.
+- **Ícones Tabler (filled)**: `@tabler/icons-react` substitui `lucide-react` em todos os componentes de app. Ícones com variante filled foram atualizados (StarFilled, CalendarFilled, CircleFilled, DiamondFilled, Stack2Filled, FolderFilled, ChevronDown/RightFilled, PlusFilled, PencilFilled, CheckFilled, SettingsFilled, CompassFilled, AlertCircleFilled, BriefcaseFilled, CalendarMonthFilled).
+
+### Changed
+- **Fundo branco nas views de tarefa**: `bg-white` adicionado ao `TaskSection`, `CalendarView`, áreas e projetos. Remove o fundo cinza claro anterior.
+- **Checkbox com label**: título da tarefa agora é `<label>` do checkbox shadcn — clicar no título alterna a tarefa. Data exibida ao lado do título em vez de abaixo.
+- **Section label como texto muted**: badge de seção movido para baixo do título como texto `text-caption text-ink-muted`, em vez de badge lateral.
+- **Lista centralizada max-w-800**: conteúdo do `TaskSection` limitado a `max-w-[800px] mx-auto` para telas grandes.
+- **Dexie schema v6**: `_server_updated_at` adicionado como coluna indexada nas tabelas `tasks`, `areas` e `projects` para permitir `update()` correto pelo sync engine.
+
+### Fixed
+- **Erro "updated_at column not found in schema cache"**: `sync-engine.ts` usava `update()` com `_server_updated_at` sem essa coluna estar no schema Dexie de `projects`. Adicionada ao schema v6. Adicionalmente, `syncTable` agora destrutiona `updated_at` do server row antes de `put()` em áreas/projetos.
+- **Botões `<button>` sem fechamento**: `areas/[id]/page.tsx` e `projects/[id]/page.tsx` tinham tags `<button>` sem `</button>` correspondente, causando erro de TSX.
+- **Ícone InboxFilled inexistente**: `IconInboxFilled` foi substituído por `IconInbox` (outline) — não existe variante filled no Tabler.
+- **Navegação lenta**: latência ao trocar entre views eliminada com store centralizado.
+
 ## [0.9.2] — 2026-06-07
 
 ### Fixed

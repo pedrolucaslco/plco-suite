@@ -50,7 +50,7 @@ export function JumpStart({ value, onChange }: JumpStartProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className={cn(
-          "w-full h-9 rounded-md border border-hairline bg-surface text-body px-3 text-left",
+          "w-full h-9 rounded-md border border-hairline bg-canvas text-body px-3 text-left",
           value ? "text-ink" : "text-ink-muted",
         )}
       >

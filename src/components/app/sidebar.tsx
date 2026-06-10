@@ -4,23 +4,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
-  Star,
-  Calendar,
-  Circle,
-  Diamond,
-  Inbox,
-  Layers2,
-  FolderClosed,
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  Pencil,
-  GripVertical,
-  RefreshCw,
-  Check,
-  Settings,
-  type LucideIcon,
-} from "lucide-react";
+  IconStarFilled,
+  IconCalendarFilled,
+  IconCalendarMonthFilled,
+  IconCircleFilled,
+  IconDiamondFilled,
+  IconInbox,
+  IconStack2Filled,
+  IconFolderFilled,
+  IconChevronDownFilled,
+  IconChevronRightFilled,
+  IconPlusFilled,
+  IconPencilFilled,
+  IconGripVertical,
+  IconRefresh,
+  IconCheckFilled,
+  IconSettingsFilled,
+} from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { NucleusSelector } from "./nucleus-selector";
 import { useNucleusStore } from "@/stores/nucleus";
@@ -39,12 +39,13 @@ import { syncEngine } from "@/lib/sync/sync-engine";
 import { draggedTaskId } from "@/lib/drag-state";
 import { SettingsSheet } from "./settings-sheet";
 
-const sections: { label: string; href: string; icon: LucideIcon }[] = [
-  { label: "Inbox", href: "/app/inbox", icon: Inbox },
-  { label: "Hoje", href: "/app/today", icon: Star },
-  { label: "Em Breve", href: "/app/upcoming", icon: Calendar },
-  { label: "Qualquer Hora", href: "/app/anytime", icon: Circle },
-  { label: "Algum Dia", href: "/app/someday", icon: Diamond },
+const sections: { label: string; href: string; icon: React.FC<{ size?: number; className?: string }> }[] = [
+  { label: "Inbox", href: "/app/inbox", icon: IconInbox },
+  { label: "Hoje", href: "/app/today", icon: IconStarFilled },
+  { label: "Em Breve", href: "/app/upcoming", icon: IconCalendarFilled },
+  { label: "Calendário", href: "/app/calendar", icon: IconCalendarMonthFilled },
+  { label: "Qualquer Hora", href: "/app/anytime", icon: IconCircleFilled },
+  { label: "Algum Dia", href: "/app/someday", icon: IconDiamondFilled },
 ];
 
 let draggedProjectId: string | null = null;
@@ -104,13 +105,13 @@ function AreaList({
             onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
             className="p-1 rounded text-ink-mid hover:text-ink shrink-0"
           >
-            {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            {open ? <IconChevronDownFilled size={14} /> : <IconChevronRightFilled size={14} />}
           </button>
           <Link
             href={`/app/areas/${area.id}`}
             className="flex items-center gap-2 flex-1 min-w-0"
           >
-            <Layers2 size={16} className="shrink-0" />
+            <IconStack2Filled size={16} className="shrink-0" />
             <span className="truncate">{area.name}</span>
           </Link>
           <button
@@ -118,7 +119,7 @@ function AreaList({
             onClick={(e) => { e.stopPropagation(); onEdit("area", area.id, area.name); }}
             className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-ink-mid hover:text-ink shrink-0"
           >
-            <Pencil size={13} />
+            <IconPencilFilled size={13} />
           </button>
         </div>
       </div>
@@ -135,7 +136,7 @@ function AreaList({
                     : "text-ink-mid hover:text-ink hover:bg-muted/50",
                 )}
               >
-                <FolderClosed size={14} className="shrink-0" />
+                <IconFolderFilled size={14} className="shrink-0" />
                 <span className="truncate">{p.name}</span>
               </Link>
               <button
@@ -143,7 +144,7 @@ function AreaList({
                 onClick={() => onEdit("project", p.id, p.name)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-ink-mid hover:text-ink shrink-0"
               >
-                <Pencil size={13} />
+                <IconPencilFilled size={13} />
               </button>
             </div>
           ))}
@@ -297,7 +298,7 @@ export function Sidebar() {
   }, [pathname]);
 
   return (
-    <aside className="w-56 shrink-0 border-r border-hairline bg-surface hidden lg:flex flex-col">
+    <aside className="w-56 shrink-0 border-r border-hairline bg-canvas hidden lg:flex flex-col">
       <div className="px-4 py-5 space-y-1">
         <Link href="/app/today" className="text-heading font-bold text-ink block">
           PLCO
@@ -306,9 +307,6 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
-        <div className="px-3 py-2 text-caption font-medium text-ink-mid uppercase tracking-wider text-xs">
-          Seções
-        </div>
         {sections.map((s) => {
           const Icon = s.icon;
           const sectionName = s.href.split("/").pop() ?? "today";
@@ -338,9 +336,6 @@ export function Sidebar() {
 
         {areas.length > 0 && (
           <>
-            <div className="px-3 pt-4 pb-2 text-caption font-medium text-ink-mid uppercase tracking-wider text-xs">
-              Áreas
-            </div>
             {areas.map((area) => (
               <AreaList key={area.id} area={area} onEdit={handleEdit} />
             ))}
@@ -349,9 +344,6 @@ export function Sidebar() {
 
         {standaloneProjects.length > 0 && (
           <>
-            <div className="px-3 pt-4 pb-2 text-caption font-medium text-ink-mid uppercase tracking-wider text-xs">
-              Projetos
-            </div>
             {standaloneProjects.map((p) => (
               <div
                 key={p.id}
@@ -368,8 +360,8 @@ export function Sidebar() {
                       : "text-ink-mid hover:text-ink hover:bg-muted/50",
                   )}
                 >
-                  <GripVertical size={14} className="shrink-0 text-ink-muted opacity-50 group-hover:opacity-100 transition-opacity" />
-                  <FolderClosed size={18} className="shrink-0" />
+                  <IconGripVertical size={14} className="shrink-0 text-ink-muted opacity-50 group-hover:opacity-100 transition-opacity" />
+                  <IconFolderFilled size={18} className="shrink-0" />
                   <span className="truncate">{p.name}</span>
                 </Link>
                 <button
@@ -377,7 +369,7 @@ export function Sidebar() {
                   onClick={() => handleEdit("project", p.id, p.name)}
                   className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-ink-mid hover:text-ink shrink-0"
                 >
-                  <Pencil size={13} />
+                  <IconPencilFilled size={13} />
                 </button>
               </div>
             ))}
@@ -404,19 +396,19 @@ export function Sidebar() {
               onClick={() => setShowNewMenu(!showNewMenu)}
               className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-body text-ink-mid hover:text-ink hover:bg-muted/50 transition-colors mt-2"
             >
-              <Plus size={16} />
+              <IconPlusFilled size={16} />
               Nova lista
             </button>
           )}
 
           {showNewMenu && !newType && (
-            <div className="absolute left-3 right-3 bottom-full mb-1 bg-surface border border-hairline rounded-lg shadow-lg overflow-hidden z-10">
+            <div className="absolute left-3 right-3 bottom-full mb-1 bg-canvas border border-hairline rounded-lg shadow-lg overflow-hidden z-10">
               <button
                 type="button"
                 onClick={() => { setNewType("area"); setShowNewMenu(false); }}
                 className="flex items-center gap-3 w-full px-3 py-2.5 text-body text-ink hover:bg-muted/50 transition-colors text-left"
               >
-                <Layers2 size={16} />
+                <IconStack2Filled size={16} />
                 Nova área
               </button>
               <button
@@ -424,7 +416,7 @@ export function Sidebar() {
                 onClick={() => { setNewType("project"); setShowNewMenu(false); }}
                 className="flex items-center gap-3 w-full px-3 py-2.5 text-body text-ink hover:bg-muted/50 transition-colors text-left"
               >
-                <FolderClosed size={16} />
+                <IconFolderFilled size={16} />
                 Novo projeto
               </button>
             </div>
@@ -440,11 +432,11 @@ export function Sidebar() {
           className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-body text-ink-mid hover:text-ink hover:bg-muted/50 transition-colors disabled:opacity-50"
         >
           {syncing ? (
-            <RefreshCw size={16} className="animate-spin" />
+            <IconRefresh size={16} className="animate-spin" />
           ) : syncOk ? (
-            <Check size={16} className="text-green-600" />
+            <IconCheckFilled size={16} className="text-green-600" />
           ) : (
-            <RefreshCw size={16} />
+            <IconRefresh size={16} />
           )}
           {syncing ? "Sincronizando..." : syncOk ? "Sincronizado!" : "Sincronizar"}
         </button>
@@ -453,7 +445,7 @@ export function Sidebar() {
           onClick={() => setSettingsOpen(true)}
           className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-body text-ink-mid hover:text-ink hover:bg-muted/50 transition-colors"
         >
-          <Settings size={16} />
+          <IconSettingsFilled size={16} />
           Configurações
         </button>
       </div>
