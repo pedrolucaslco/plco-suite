@@ -8,73 +8,73 @@ import { useNucleusStore } from "@/stores/nucleus";
 import { useTaskStore } from "@/stores/tasks";
 
 export function useTaskSubscription() {
-  const nucleusId = useNucleusStore((s) => s.currentNucleusId);
-  const setTasks = useTaskStore((s) => s.setTasks);
-  const setSyncState = useTaskStore((s) => s.setSyncState);
+ const nucleusId = useNucleusStore((s) => s.currentNucleusId);
+ const setTasks = useTaskStore((s) => s.setTasks);
+ const setSyncState = useTaskStore((s) => s.setSyncState);
 
-  useEffect(() => {
-    if (!nucleusId) return;
+ useEffect(() => {
+ if (!nucleusId) return;
 
-    const sub = liveQuery(() =>
-      db.tasks.where("nuclei_id").equals(nucleusId).toArray(),
-    ).subscribe({
-      next: setTasks,
-      error: () => {},
-    });
+ const sub = liveQuery(() =>
+ db.tasks.where("nuclei_id").equals(nucleusId).toArray(),
+ ).subscribe({
+ next: setTasks,
+ error: () => {},
+ });
 
-    return () => sub.unsubscribe();
-  }, [nucleusId, setTasks]);
+ return () => sub.unsubscribe();
+ }, [nucleusId, setTasks]);
 
-  useEffect(() => {
-    if (!nucleusId) return;
+ useEffect(() => {
+ if (!nucleusId) return;
 
-    syncEngine.initialPull(nucleusId);
+ syncEngine.initialPull(nucleusId);
 
-    const interval = setInterval(() => {
-      if (navigator.onLine) {
-        syncEngine.pullRemote(nucleusId);
-      }
-    }, 30000);
+ const interval = setInterval(() => {
+ if (navigator.onLine) {
+ syncEngine.pullRemote(nucleusId);
+ }
+ }, 30000);
 
-    return () => clearInterval(interval);
-  }, [nucleusId]);
+ return () => clearInterval(interval);
+ }, [nucleusId]);
 
-  useEffect(() => {
-    const unsub = syncEngine.subscribe((event) => {
-      switch (event.type) {
-        case "syncing":
-          setSyncState("syncing");
-          break;
-        case "synced":
-          setSyncState("synced");
-          break;
-        case "error":
-          setSyncState("error", event.message);
-          break;
-        case "conflict":
-          setSyncState("conflict");
-          break;
-      }
-    });
+ useEffect(() => {
+ const unsub = syncEngine.subscribe((event) => {
+ switch (event.type) {
+ case "syncing":
+ setSyncState("syncing");
+ break;
+ case "synced":
+ setSyncState("synced");
+ break;
+ case "error":
+ setSyncState("error", event.message);
+ break;
+ case "conflict":
+ setSyncState("conflict");
+ break;
+ }
+ });
 
-    return () => { unsub(); };
-  }, [setSyncState]);
+ return () => { unsub(); };
+ }, [setSyncState]);
 
-  useEffect(() => {
-    function handleOnline() {
-      setSyncState("syncing");
-      syncEngine.pushPending();
-      if (nucleusId) syncEngine.pullRemote(nucleusId);
-    }
-    function handleOffline() {
-      setSyncState("offline");
-    }
+ useEffect(() => {
+ function handleOnline() {
+ setSyncState("syncing");
+ syncEngine.pushPending();
+ if (nucleusId) syncEngine.pullRemote(nucleusId);
+ }
+ function handleOffline() {
+ setSyncState("offline");
+ }
 
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, [nucleusId, setSyncState]);
+ window.addEventListener("online", handleOnline);
+ window.addEventListener("offline", handleOffline);
+ return () => {
+ window.removeEventListener("online", handleOnline);
+ window.removeEventListener("offline", handleOffline);
+ };
+ }, [nucleusId, setSyncState]);
 }
